@@ -54,6 +54,12 @@ public class Resume {
     private String colorTheme = "blue";
 
     /**
+     * JSON string containing all resume data
+     * Used for flexible storage of editor content
+     */
+    private String content;
+
+    /**
      * Personal information section
      */
     private PersonalInfo personalInfo;

@@ -149,11 +149,15 @@ export function ResumeEditor() {
             setIsSaving(true);
             await api.put(`/resume/${id}`, {
                 title: resumeData.title,
+                template: resumeData.template,
+                colorTheme: resumeData.theme,
                 content: JSON.stringify(resumeData),
             });
             setLastSaved(new Date());
+            console.log('✅ Auto-saved successfully at', new Date().toISOString());
         } catch (err) {
-            console.error('Auto-save failed:', err);
+            console.error('❌ Auto-save failed:', err);
+            toast.error('Failed to save changes', { duration: 2000 });
         } finally {
             setIsSaving(false);
         }
