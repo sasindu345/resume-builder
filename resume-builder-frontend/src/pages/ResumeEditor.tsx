@@ -74,8 +74,16 @@ export function ResumeEditor() {
     const [isSaving, setIsSaving] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
+    const [currentStep, setCurrentStep] = useState(0);
     const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
     const previewRef = useRef<HTMLDivElement>(null);
+
+    // Step configuration
+    const steps = [
+        { title: 'Personal Info', description: 'Basic information and summary' },
+        { title: 'Experience & Education', description: 'Work history and academic background' },
+        { title: 'Skills & More', description: 'Skills, projects, and certifications' },
+    ];
 
     // Keyboard shortcuts (Phase 5)
     useEffect(() => {
@@ -378,6 +386,37 @@ export function ResumeEditor() {
 
             {/* Main Content */}
             <div className="max-w-7xl mx-auto p-6">
+                {/* Step Progress Indicator */}
+                <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-6 mb-6 border">
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 style={{ color: 'var(--text)' }} className="text-sm font-medium">
+                            Step {currentStep + 1} of {steps.length}
+                        </h3>
+                        <span style={{ color: 'var(--muted)' }} className="text-xs">
+                            {Math.round(((currentStep + 1) / steps.length) * 100)}% Complete
+                        </span>
+                    </div>
+                    <div className="mb-3">
+                        <div style={{ background: 'var(--border)' }} className="w-full h-2 rounded-full overflow-hidden">
+                            <div
+                                className="h-full transition-all duration-300"
+                                style={{
+                                    background: 'var(--primary-600)',
+                                    width: `${((currentStep + 1) / steps.length) * 100}%`
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style={{ color: 'var(--text)' }} className="text-lg font-semibold mb-1">
+                            {steps[currentStep].title}
+                        </h4>
+                        <p style={{ color: 'var(--muted)' }} className="text-sm">
+                            {steps[currentStep].description}
+                        </p>
+                    </div>
+                </div>
+
                 <div className={`grid grid-cols-1 md:[grid-template-columns:minmax(0,1fr)_820px] gap-6 items-start ${editorStyles.editorGrid}`}>
                     {/* Left: Form */}
                     <motion.div
