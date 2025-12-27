@@ -385,11 +385,11 @@ export function ResumeEditor() {
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto p-6">
+            <div className="max-w-7xl mx-auto p-2 sm:p-3">
                 {/* Step Progress Indicator */}
-                <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-6 mb-6 border">
-                    <div className="flex items-center justify-between mb-2">
-                        <h3 style={{ color: 'var(--text)' }} className="text-sm font-medium">
+                <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-3 sm:p-4 mb-3 sm:mb-4 border">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                        <h3 style={{ color: 'var(--text)' }} className="text-xs sm:text-sm font-medium">
                             Step {currentStep + 1} of {steps.length}
                         </h3>
                         <span style={{ color: 'var(--muted)' }} className="text-xs">
@@ -408,10 +408,10 @@ export function ResumeEditor() {
                         </div>
                     </div>
                     <div>
-                        <h4 style={{ color: 'var(--text)' }} className="text-lg font-semibold mb-1">
+                        <h4 style={{ color: 'var(--text)' }} className="text-base sm:text-lg font-semibold mb-1">
                             {steps[currentStep].title}
                         </h4>
-                        <p style={{ color: 'var(--muted)' }} className="text-sm">
+                        <p style={{ color: 'var(--muted)' }} className="text-xs sm:text-sm">
                             {steps[currentStep].description}
                         </p>
                     </div>
@@ -423,13 +423,13 @@ export function ResumeEditor() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="space-y-6"
+                        className="space-y-4"
                     >
                         {/* Step 0: Personal Information & Design */}
                         {currentStep === 0 && (
                             <>
                                 {/* Resume Title */}
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-white rounded-lg shadow p-4">
                                     <h2 className="text-lg font-semibold text-slate-900 mb-4">Resume Title</h2>
                                     <Input
                                         value={resumeData.title}
@@ -439,7 +439,7 @@ export function ResumeEditor() {
                                 </div>
 
                                 {/* Template & Theme Selection */}
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-white rounded-lg shadow p-4">
                                     <h2 className="text-lg font-semibold text-slate-900 mb-4">Design</h2>
                                     <div className="grid grid-cols-2 gap-4">
                                         {/* Template Selector */}
@@ -482,7 +482,7 @@ export function ResumeEditor() {
                                 </div>
 
                                 {/* Personal Information */}
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-white rounded-lg shadow p-4">
                                     <h2 className="text-lg font-semibold text-slate-900 mb-4">Personal Information</h2>
                                     <div className="space-y-4">
                                         <Input
@@ -531,7 +531,7 @@ export function ResumeEditor() {
                         {currentStep === 1 && (
                             <>
                                 {/* Education Section */}
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-white rounded-lg shadow p-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <h2 className="text-lg font-semibold text-slate-900">Education</h2>
                                         <button
@@ -600,7 +600,7 @@ export function ResumeEditor() {
                                 </div>
 
                                 {/* Experience Section */}
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-white rounded-lg shadow p-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <h2 className="text-lg font-semibold text-slate-900">Experience</h2>
                                         <button
@@ -675,7 +675,7 @@ export function ResumeEditor() {
                         {currentStep === 2 && (
                             <>
                                 {/* Skills Section */}
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-white rounded-lg shadow p-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <h2 className="text-lg font-semibold text-slate-900">Skills</h2>
                                         <button
@@ -727,8 +727,8 @@ export function ResumeEditor() {
                         )}
 
                         {/* Navigation Buttons */}
-                        <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-6 border">
-                            <div className="flex items-center justify-between">
+                        <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-3 sm:p-4 border">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
                                 <button
                                     onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                                     disabled={currentStep === 0}
@@ -737,11 +737,11 @@ export function ResumeEditor() {
                                         color: '#ffffff',
                                         opacity: currentStep === 0 ? 0.5 : 1,
                                     }}
-                                    className="px-6 py-2 rounded-lg font-medium transition-all disabled:cursor-not-allowed"
+                                    className="px-6 py-2.5 sm:py-2 rounded-lg font-medium transition-all disabled:cursor-not-allowed order-2 sm:order-1"
                                 >
                                     Previous
                                 </button>
-                                <span style={{ color: 'var(--muted)' }} className="text-sm">
+                                <span style={{ color: 'var(--muted)' }} className="text-xs sm:text-sm text-center order-1 sm:order-2">
                                     Step {currentStep + 1} of {steps.length}
                                 </span>
                                 <button
@@ -754,7 +754,7 @@ export function ResumeEditor() {
                                         background: 'var(--primary-600)',
                                         color: '#ffffff',
                                     }}
-                                    className="px-6 py-2 rounded-lg font-medium transition-all hover:opacity-90"
+                                    className="px-6 py-2.5 sm:py-2 rounded-lg font-medium transition-all hover:opacity-90 order-3"
                                 >
                                     {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
                                 </button>
