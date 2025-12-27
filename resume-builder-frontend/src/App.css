@@ -1,0 +1,60 @@
+/* Removed #root constraints to allow full-width home page */
+#root {
+  /* Styles moved to specific pages */
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  align-items: center;
+  padding: 6rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.cta {
+  display: inline-flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1.35rem;
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.25);
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+  text-decoration: none;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  background: #2563eb;
+  box-shadow: 0 16px 38px rgba(37, 99, 235, 0.25);
+}
+
+.cta.secondary {
+  background: white;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.cta.secondary:hover {
+  background: #eff6ff;
+  transform: translateY(-2px);
+}

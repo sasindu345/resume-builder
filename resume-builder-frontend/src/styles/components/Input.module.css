@@ -1,0 +1,165 @@
+/* Input Component Interactive Styles (Phase 5 Polish) */
+
+.inputWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.inputLabel {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.inputRequired {
+    color: #dc2626;
+    margin-left: 0.25rem;
+}
+
+.inputContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inputField {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--surface);
+    color: var(--text);
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.inputField::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+}
+
+.inputField:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.inputField:hover:not(:disabled):not(:focus) {
+    border-color: var(--muted);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.05);
+}
+
+.inputField:disabled {
+    background: var(--bg);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Error State */
+.inputError {
+    border-color: #dc2626;
+}
+
+.inputError:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    border-color: #dc2626;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 0.75rem;
+    display: flex;
+    align-items: center;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.inputWithIcon {
+    padding-left: 2.5rem;
+}
+
+.errorMessage {
+    font-size: 0.875rem;
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.hintMessage {
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+/* Textarea Extension */
+.textareaField {
+    resize: vertical;
+    min-height: 6rem;
+    max-height: 15rem;
+}
+
+.textareaField::-webkit-scrollbar {
+    width: 6px;
+}
+
+.textareaField::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+.textareaField::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.textareaField::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
+}
+
+/* Focus Ring for Accessibility */
+@media (prefers-reduced-motion: no-preference) {
+    .inputField:focus {
+        animation: focusPulse 0.3s ease-out;
+    }
+}
+
+@keyframes focusPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.2);
+    }
+
+    100% {
+        box-shadow: 0 0 0 6px rgba(37, 99, 235, 0);
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .inputField {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .inputLabel {
+        font-size: 0.8125rem;
+    }
+
+    .errorMessage,
+    .hintMessage {
+        font-size: 0.8125rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .inputWrapper {
+        gap: 0.25rem;
+    }
+
+    .inputField {
+        padding: 0.5rem 0.625rem;
+        font-size: 1rem;
+        /* Prevent zoom on iOS */
+    }
+}

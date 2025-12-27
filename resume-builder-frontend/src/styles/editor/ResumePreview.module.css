@@ -1,0 +1,76 @@
+.sheet {
+    width: 794px;
+    min-height: 1123px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.sheet>* {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Tablet: Reduce width */
+@media (max-width: 1280px) {
+    .sheet {
+        width: 700px;
+        min-height: 990px;
+    }
+}
+
+/* Tablet: Further reduce */
+@media (max-width: 1024px) {
+    .sheet {
+        width: 600px;
+        min-height: 849px;
+    }
+}
+
+/* Mobile: Full width */
+@media (max-width: 768px) {
+    .sheet {
+        width: 100%;
+        min-height: auto;
+        margin: 0 auto;
+        padding: 16px;
+    }
+}
+
+/* Small mobile: Minimal padding */
+@media (max-width: 480px) {
+    .sheet {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+    }
+}
+
+@media print {
+    .sheet {
+        box-shadow: none;
+        border: none;
+        width: 100%;
+        min-height: auto;
+    }
+}
+
+/* Typography helpers for dark mode support */
+.sheetHeader {
+    color: var(--text);
+    transition: color 0.3s ease;
+}
+
+.sheetText {
+    color: var(--text);
+    transition: color 0.3s ease;
+}
+
+.sheetMuted {
+    color: var(--muted);
+    transition: color 0.3s ease;
+}
