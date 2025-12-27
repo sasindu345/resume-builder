@@ -425,288 +425,339 @@ export function ResumeEditor() {
                         transition={{ duration: 0.3 }}
                         className="space-y-6"
                     >
-                        {/* Resume Title */}
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-4">Resume Title</h2>
-                            <Input
-                                value={resumeData.title}
-                                onChange={(e) => setResumeData({ ...resumeData, title: e.target.value })}
-                                placeholder="My Resume"
-                            />
-                        </div>
-
-                        {/* Template & Theme Selection */}
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-4">Design</h2>
-                            <div className="grid grid-cols-2 gap-4">
-                                {/* Template Selector */}
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Template
-                                    </label>
-                                    <select
-                                        value={resumeData.template}
-                                        onChange={(e) => setResumeData({ ...resumeData, template: e.target.value as TemplateName })}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                    >
-                                        <option value="modern">Modern</option>
-                                        <option value="classic">Classic</option>
-                                        <option value="minimal">Minimal</option>
-                                        <option value="professional">Professional</option>
-                                        <option value="creative">Creative</option>
-                                    </select>
-                                </div>
-
-                                {/* Theme Selector */}
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Color Theme
-                                    </label>
-                                    <select
-                                        value={resumeData.theme}
-                                        onChange={(e) => setResumeData({ ...resumeData, theme: e.target.value as ThemeName })}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                    >
-                                        <option value="blue">Blue</option>
-                                        <option value="green">Green</option>
-                                        <option value="purple">Purple</option>
-                                        <option value="red">Red</option>
-                                        <option value="orange">Orange</option>
-                                        <option value="gray">Gray</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Personal Information */}
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-4">Personal Information</h2>
-                            <div className="space-y-4">
-                                <Input
-                                    label="Full Name"
-                                    value={resumeData.personalInfo.fullName}
-                                    onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
-                                    placeholder="John Doe"
-                                />
-                                <Input
-                                    label="Email"
-                                    type="email"
-                                    value={resumeData.personalInfo.email}
-                                    onChange={(e) => updatePersonalInfo('email', e.target.value)}
-                                    placeholder="john@example.com"
-                                />
-                                <Input
-                                    label="Phone"
-                                    value={resumeData.personalInfo.phone}
-                                    onChange={(e) => updatePersonalInfo('phone', e.target.value)}
-                                    placeholder="+1 (555) 000-0000"
-                                />
-                                <Input
-                                    label="Location"
-                                    value={resumeData.personalInfo.location}
-                                    onChange={(e) => updatePersonalInfo('location', e.target.value)}
-                                    placeholder="New York, NY"
-                                />
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                                        Professional Summary
-                                    </label>
-                                    <textarea
-                                        value={resumeData.personalInfo.summary}
-                                        onChange={(e) => updatePersonalInfo('summary', e.target.value)}
-                                        placeholder="Write a brief summary about yourself..."
-                                        rows={3}
-                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                        {/* Step 0: Personal Information & Design */}
+                        {currentStep === 0 && (
+                            <>
+                                {/* Resume Title */}
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <h2 className="text-lg font-semibold text-slate-900 mb-4">Resume Title</h2>
+                                    <Input
+                                        value={resumeData.title}
+                                        onChange={(e) => setResumeData({ ...resumeData, title: e.target.value })}
+                                        placeholder="My Resume"
                                     />
                                 </div>
-                            </div>
-                        </div>
 
-                        {/* Education Section */}
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-slate-900">Education</h2>
-                                <button
-                                    onClick={addEducation}
-                                    aria-label="Add education entry"
-                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                                >
-                                    <PlusIcon className="h-5 w-5" />
-                                    Add
-                                </button>
-                            </div>
-                            <div className="space-y-4">
-                                {resumeData.education.map((edu) => (
-                                    <div key={edu.id} className="p-4 border border-slate-200 rounded-lg space-y-3">
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Input
-                                                label="Degree"
-                                                value={edu.degree}
-                                                onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
-                                                placeholder="Bachelor's"
-                                            />
-                                            <Input
-                                                label="Institution"
-                                                value={edu.institution}
-                                                onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)}
-                                                placeholder="University Name"
-                                            />
+                                {/* Template & Theme Selection */}
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <h2 className="text-lg font-semibold text-slate-900 mb-4">Design</h2>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {/* Template Selector */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                                Template
+                                            </label>
+                                            <select
+                                                value={resumeData.template}
+                                                onChange={(e) => setResumeData({ ...resumeData, template: e.target.value as TemplateName })}
+                                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                            >
+                                                <option value="modern">Modern</option>
+                                                <option value="classic">Classic</option>
+                                                <option value="minimal">Minimal</option>
+                                                <option value="professional">Professional</option>
+                                                <option value="creative">Creative</option>
+                                            </select>
                                         </div>
-                                        <Input
-                                            label="Field of Study"
-                                            value={edu.fieldOfStudy}
-                                            onChange={(e) => updateEducation(edu.id, 'fieldOfStudy', e.target.value)}
-                                            placeholder="Computer Science"
-                                        />
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Input
-                                                label="Start Date"
-                                                type="month"
-                                                value={edu.startDate}
-                                                onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
-                                            />
-                                            <Input
-                                                label="End Date"
-                                                type="month"
-                                                value={edu.endDate}
-                                                onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
-                                            />
+
+                                        {/* Theme Selector */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                                Color Theme
+                                            </label>
+                                            <select
+                                                value={resumeData.theme}
+                                                onChange={(e) => setResumeData({ ...resumeData, theme: e.target.value as ThemeName })}
+                                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                            >
+                                                <option value="blue">Blue</option>
+                                                <option value="green">Green</option>
+                                                <option value="purple">Purple</option>
+                                                <option value="red">Red</option>
+                                                <option value="orange">Orange</option>
+                                                <option value="gray">Gray</option>
+                                            </select>
                                         </div>
-                                        <Input
-                                            label="GPA (Optional)"
-                                            value={edu.gpa}
-                                            onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
-                                            placeholder="3.8"
-                                        />
-                                        <button
-                                            onClick={() => removeEducation(edu.id)}
-                                            aria-label="Remove education entry"
-                                            className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors text-sm"
-                                        >
-                                            <TrashIcon className="h-4 w-4" />
-                                            Remove
-                                        </button>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
+                                </div>
 
-                        {/* Experience Section */}
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-slate-900">Experience</h2>
-                                <button
-                                    onClick={addExperience}
-                                    aria-label="Add experience entry"
-                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                                >
-                                    <PlusIcon className="h-5 w-5" />
-                                    Add
-                                </button>
-                            </div>
-                            <div className="space-y-4">
-                                {resumeData.experience.map((exp) => (
-                                    <div key={exp.id} className="p-4 border border-slate-200 rounded-lg space-y-3">
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Input
-                                                label="Job Title"
-                                                value={exp.jobTitle}
-                                                onChange={(e) => updateExperience(exp.id, 'jobTitle', e.target.value)}
-                                                placeholder="Software Engineer"
-                                            />
-                                            <Input
-                                                label="Company"
-                                                value={exp.company}
-                                                onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
-                                                placeholder="Company Name"
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Input
-                                                label="Start Date"
-                                                type="month"
-                                                value={exp.startDate}
-                                                onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
-                                            />
-                                            <Input
-                                                label="End Date"
-                                                type="month"
-                                                value={exp.endDate}
-                                                onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
-                                            />
-                                        </div>
+                                {/* Personal Information */}
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <h2 className="text-lg font-semibold text-slate-900 mb-4">Personal Information</h2>
+                                    <div className="space-y-4">
+                                        <Input
+                                            label="Full Name"
+                                            value={resumeData.personalInfo.fullName}
+                                            onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
+                                            placeholder="John Doe"
+                                        />
+                                        <Input
+                                            label="Email"
+                                            type="email"
+                                            value={resumeData.personalInfo.email}
+                                            onChange={(e) => updatePersonalInfo('email', e.target.value)}
+                                            placeholder="john@example.com"
+                                        />
+                                        <Input
+                                            label="Phone"
+                                            value={resumeData.personalInfo.phone}
+                                            onChange={(e) => updatePersonalInfo('phone', e.target.value)}
+                                            placeholder="+1 (555) 000-0000"
+                                        />
+                                        <Input
+                                            label="Location"
+                                            value={resumeData.personalInfo.location}
+                                            onChange={(e) => updatePersonalInfo('location', e.target.value)}
+                                            placeholder="New York, NY"
+                                        />
                                         <div>
                                             <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                Description
+                                                Professional Summary
                                             </label>
                                             <textarea
-                                                value={exp.description}
-                                                onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
-                                                placeholder="Describe your responsibilities and achievements..."
+                                                value={resumeData.personalInfo.summary}
+                                                onChange={(e) => updatePersonalInfo('summary', e.target.value)}
+                                                placeholder="Write a brief summary about yourself..."
                                                 rows={3}
                                                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
                                             />
                                         </div>
-                                        <button
-                                            onClick={() => removeExperience(exp.id)}
-                                            aria-label="Remove experience entry"
-                                            className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors text-sm"
-                                        >
-                                            <TrashIcon className="h-4 w-4" />
-                                            Remove
-                                        </button>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
+                                </div>
+                            </>
+                        )}
 
-                        {/* Skills Section */}
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-slate-900">Skills</h2>
-                                <button
-                                    onClick={addSkill}
-                                    aria-label="Add skill entry"
-                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                                >
-                                    <PlusIcon className="h-5 w-5" />
-                                    Add
-                                </button>
-                            </div>
-                            <div className="space-y-3">
-                                {resumeData.skills.map((skill) => (
-                                    <div key={skill.id} className="flex items-end gap-3">
-                                        <div className="flex-1 grid grid-cols-2 gap-2">
-                                            <Input
-                                                label="Skill"
-                                                value={skill.name}
-                                                onChange={(e) => updateSkill(skill.id, 'name', e.target.value)}
-                                                placeholder="React"
-                                            />
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                    Proficiency
-                                                </label>
-                                                <select
-                                                    value={skill.proficiency}
-                                                    onChange={(e) => updateSkill(skill.id, 'proficiency', e.target.value)}
-                                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                                >
-                                                    <option>Beginner</option>
-                                                    <option>Intermediate</option>
-                                                    <option>Advanced</option>
-                                                    <option>Expert</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                        {/* Step 1: Education & Experience */}
+                        {currentStep === 1 && (
+                            <>
+                                {/* Education Section */}
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-lg font-semibold text-slate-900">Education</h2>
                                         <button
-                                            onClick={() => removeSkill(skill.id)}
-                                            className="text-red-600 hover:text-red-700 transition-colors"
+                                            onClick={addEducation}
+                                            aria-label="Add education entry"
+                                            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
                                         >
-                                            <TrashIcon className="h-5 w-5" />
+                                            <PlusIcon className="h-5 w-5" />
+                                            Add
                                         </button>
                                     </div>
-                                ))}
+                                    <div className="space-y-4">
+                                        {resumeData.education.map((edu) => (
+                                            <div key={edu.id} className="p-4 border border-slate-200 rounded-lg space-y-3">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <Input
+                                                        label="Degree"
+                                                        value={edu.degree}
+                                                        onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
+                                                        placeholder="Bachelor's"
+                                                    />
+                                                    <Input
+                                                        label="Institution"
+                                                        value={edu.institution}
+                                                        onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)}
+                                                        placeholder="University Name"
+                                                    />
+                                                </div>
+                                                <Input
+                                                    label="Field of Study"
+                                                    value={edu.fieldOfStudy}
+                                                    onChange={(e) => updateEducation(edu.id, 'fieldOfStudy', e.target.value)}
+                                                    placeholder="Computer Science"
+                                                />
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <Input
+                                                        label="Start Date"
+                                                        type="month"
+                                                        value={edu.startDate}
+                                                        onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
+                                                    />
+                                                    <Input
+                                                        label="End Date"
+                                                        type="month"
+                                                        value={edu.endDate}
+                                                        onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
+                                                    />
+                                                </div>
+                                                <Input
+                                                    label="GPA (Optional)"
+                                                    value={edu.gpa}
+                                                    onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
+                                                    placeholder="3.8"
+                                                />
+                                                <button
+                                                    onClick={() => removeEducation(edu.id)}
+                                                    aria-label="Remove education entry"
+                                                    className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors text-sm"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Experience Section */}
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-lg font-semibold text-slate-900">Experience</h2>
+                                        <button
+                                            onClick={addExperience}
+                                            aria-label="Add experience entry"
+                                            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                                        >
+                                            <PlusIcon className="h-5 w-5" />
+                                            Add
+                                        </button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {resumeData.experience.map((exp) => (
+                                            <div key={exp.id} className="p-4 border border-slate-200 rounded-lg space-y-3">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <Input
+                                                        label="Job Title"
+                                                        value={exp.jobTitle}
+                                                        onChange={(e) => updateExperience(exp.id, 'jobTitle', e.target.value)}
+                                                        placeholder="Software Engineer"
+                                                    />
+                                                    <Input
+                                                        label="Company"
+                                                        value={exp.company}
+                                                        onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
+                                                        placeholder="Company Name"
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <Input
+                                                        label="Start Date"
+                                                        type="month"
+                                                        value={exp.startDate}
+                                                        onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
+                                                    />
+                                                    <Input
+                                                        label="End Date"
+                                                        type="month"
+                                                        value={exp.endDate}
+                                                        onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                        Description
+                                                    </label>
+                                                    <textarea
+                                                        value={exp.description}
+                                                        onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
+                                                        placeholder="Describe your responsibilities and achievements..."
+                                                        rows={3}
+                                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                                    />
+                                                </div>
+                                                <button
+                                                    onClick={() => removeExperience(exp.id)}
+                                                    aria-label="Remove experience entry"
+                                                    className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors text-sm"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                            </>
+                        )}
+
+                        {/* Step 2: Skills & More */}
+                        {currentStep === 2 && (
+                            <>
+                                {/* Skills Section */}
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-lg font-semibold text-slate-900">Skills</h2>
+                                        <button
+                                            onClick={addSkill}
+                                            aria-label="Add skill entry"
+                                            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                                        >
+                                            <PlusIcon className="h-5 w-5" />
+                                            Add
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {resumeData.skills.map((skill) => (
+                                            <div key={skill.id} className="flex items-end gap-3">
+                                                <div className="flex-1 grid grid-cols-2 gap-2">
+                                                    <Input
+                                                        label="Skill"
+                                                        value={skill.name}
+                                                        onChange={(e) => updateSkill(skill.id, 'name', e.target.value)}
+                                                        placeholder="React"
+                                                    />
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                            Proficiency
+                                                        </label>
+                                                        <select
+                                                            value={skill.proficiency}
+                                                            onChange={(e) => updateSkill(skill.id, 'proficiency', e.target.value)}
+                                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                                        >
+                                                            <option>Beginner</option>
+                                                            <option>Intermediate</option>
+                                                            <option>Advanced</option>
+                                                            <option>Expert</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => removeSkill(skill.id)}
+                                                    className="text-red-600 hover:text-red-700 transition-colors"
+                                                >
+                                                    <TrashIcon className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Navigation Buttons */}
+                        <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-6 border">
+                            <div className="flex items-center justify-between">
+                                <button
+                                    onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+                                    disabled={currentStep === 0}
+                                    style={{
+                                        background: currentStep === 0 ? 'var(--muted)' : 'var(--primary-600)',
+                                        color: '#ffffff',
+                                        opacity: currentStep === 0 ? 0.5 : 1,
+                                    }}
+                                    className="px-6 py-2 rounded-lg font-medium transition-all disabled:cursor-not-allowed"
+                                >
+                                    Previous
+                                </button>
+                                <span style={{ color: 'var(--muted)' }} className="text-sm">
+                                    Step {currentStep + 1} of {steps.length}
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        if (currentStep < steps.length - 1) {
+                                            setCurrentStep(currentStep + 1);
+                                        }
+                                    }}
+                                    style={{
+                                        background: 'var(--primary-600)',
+                                        color: '#ffffff',
+                                    }}
+                                    className="px-6 py-2 rounded-lg font-medium transition-all hover:opacity-90"
+                                >
+                                    {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
+                                </button>
                             </div>
                         </div>
                     </motion.div>
