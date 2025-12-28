@@ -72,9 +72,9 @@ export function Home() {
                             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
                                 <div className="flex items-center gap-2">
                                     <div className="flex gap-1.5">
-                                        <div className="w-3 h-3 bg-white/30 rounded-full"></div>
-                                        <div className="w-3 h-3 bg-white/30 rounded-full"></div>
-                                        <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                                        <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.3)' }}></div>
+                                        <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.3)' }}></div>
+                                        <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.3)' }}></div>
                                     </div>
                                     <span className="text-white font-medium ml-4">Live Preview</span>
                                 </div>
