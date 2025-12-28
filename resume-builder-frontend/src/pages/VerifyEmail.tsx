@@ -53,7 +53,7 @@ export const VerifyEmail = () => {
             <FloatingShapes />
 
             <div className="w-full max-w-md">
-                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 text-center">
+                <div className="rounded-2xl shadow-xl p-8 text-center" style={{ background: 'var(--surface)' }}>
                     {/* Logo/Header */}
                     <Link to="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 inline-block mb-8">
                         Resume Builder
