@@ -5,6 +5,7 @@
 
 import { InputHTMLAttributes, ReactNode, forwardRef } from 'react'
 import clsx from 'clsx'
+import styles from '../../styles/components/Input.module.css'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string
@@ -29,10 +30,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     <input
                         ref={ref}
                         className={clsx(
+                            // base layout & spacing
                             'w-full px-4 py-2.5 text-base border-2 rounded-lg transition-all duration-150',
+                            // focus styles
                             'focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500/30',
-                            'bg-white dark:bg-white/10 placeholder-slate-400 dark:placeholder-slate-600 text-slate-900 dark:text-slate-900',
-                            icon && 'pl-10',
+                            // background/placeholder only — text color now comes from the CSS module so it follows theme variables
+                            'bg-white dark:bg-white/10 placeholder-slate-400 dark:placeholder-slate-600',
+                            // ensure theme-driven text color and textarea sizing come from CSS module
+                            styles.inputField,
+                            icon && styles.inputWithIcon,
                             error && 'border-red-300 focus:border-red-500 focus:ring-red-200',
                             !error && 'border-slate-300 dark:border-slate-600',
                             className
