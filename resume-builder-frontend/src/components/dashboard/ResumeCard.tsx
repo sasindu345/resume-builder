@@ -25,7 +25,8 @@ export function ResumeCard({ resume, onEdit, onDelete, onRename }: ResumeCardPro
         <motion.div
             variants={cardVariants}
             whileHover={{ y: -4 }}
-            className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition"
+            className="rounded-lg border overflow-hidden shadow-sm hover:shadow-md transition"
+            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
         >
             {/* Thumbnail */}
             <div className="h-32 bg-gradient-to-br from-blue-100 to-blue-50 relative overflow-hidden">
@@ -53,7 +54,7 @@ export function ResumeCard({ resume, onEdit, onDelete, onRename }: ResumeCardPro
             </div>
 
             {/* Actions */}
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex gap-2">
+            <div className="px-4 py-3 border-t flex gap-2" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
                 <button
                     onClick={onEdit}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition"

@@ -349,10 +349,10 @@ export function ResumeEditor() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
             {/* Header */}
-            <div className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="sticky top-0 z-40 border-b shadow-sm" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between" style={{ background: 'var(--bg)' }}>
                     <button
                         onClick={() => navigate('/dashboard')}
                         aria-label="Back to dashboard"
@@ -385,7 +385,7 @@ export function ResumeEditor() {
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto p-2 sm:p-3">
+            <div className="max-w-7xl mx-auto p-2 sm:p-3" style={{ background: 'var(--bg)' }}>
                 {/* Step Progress Indicator */}
                 <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-3 sm:p-4 mb-3 sm:mb-4 border">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
@@ -429,8 +429,8 @@ export function ResumeEditor() {
                         {currentStep === 0 && (
                             <>
                                 {/* Resume Title */}
-                                <div className="bg-white rounded-lg shadow p-4">
-                                    <h2 className="text-lg font-semibold text-slate-900 mb-4">Resume Title</h2>
+                                <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
+                                    <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>Resume Title</h2>
                                     <Input
                                         value={resumeData.title}
                                         onChange={(e) => setResumeData({ ...resumeData, title: e.target.value })}
@@ -439,18 +439,19 @@ export function ResumeEditor() {
                                 </div>
 
                                 {/* Template & Theme Selection */}
-                                <div className="bg-white rounded-lg shadow p-4">
-                                    <h2 className="text-lg font-semibold text-slate-900 mb-4">Design</h2>
+                                <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
+                                    <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>Design</h2>
                                     <div className="grid grid-cols-2 gap-4">
                                         {/* Template Selector */}
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
                                                 Template
                                             </label>
                                             <select
                                                 value={resumeData.template}
                                                 onChange={(e) => setResumeData({ ...resumeData, template: e.target.value as TemplateName })}
-                                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                                className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                                style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
                                             >
                                                 <option value="modern">Modern</option>
                                                 <option value="classic">Classic</option>
@@ -462,13 +463,14 @@ export function ResumeEditor() {
 
                                         {/* Theme Selector */}
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
                                                 Color Theme
                                             </label>
                                             <select
                                                 value={resumeData.theme}
                                                 onChange={(e) => setResumeData({ ...resumeData, theme: e.target.value as ThemeName })}
-                                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                                className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                                style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
                                             >
                                                 <option value="blue">Blue</option>
                                                 <option value="green">Green</option>
@@ -482,8 +484,8 @@ export function ResumeEditor() {
                                 </div>
 
                                 {/* Personal Information */}
-                                <div className="bg-white rounded-lg shadow p-4">
-                                    <h2 className="text-lg font-semibold text-slate-900 mb-4">Personal Information</h2>
+                                <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
+                                    <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>Personal Information</h2>
                                     <div className="space-y-4">
                                         <Input
                                             label="Full Name"
@@ -511,7 +513,7 @@ export function ResumeEditor() {
                                             placeholder="New York, NY"
                                         />
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
                                                 Professional Summary
                                             </label>
                                             <textarea
@@ -519,7 +521,8 @@ export function ResumeEditor() {
                                                 onChange={(e) => updatePersonalInfo('summary', e.target.value)}
                                                 placeholder="Write a brief summary about yourself..."
                                                 rows={3}
-                                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                                style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
                                             />
                                         </div>
                                     </div>
@@ -531,9 +534,9 @@ export function ResumeEditor() {
                         {currentStep === 1 && (
                             <>
                                 {/* Education Section */}
-                                <div className="bg-white rounded-lg shadow p-4">
+                                <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
                                     <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-lg font-semibold text-slate-900">Education</h2>
+                                        <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Education</h2>
                                         <button
                                             onClick={addEducation}
                                             aria-label="Add education entry"
@@ -600,9 +603,9 @@ export function ResumeEditor() {
                                 </div>
 
                                 {/* Experience Section */}
-                                <div className="bg-white rounded-lg shadow p-4">
+                                <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
                                     <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-lg font-semibold text-slate-900">Experience</h2>
+                                        <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Experience</h2>
                                         <button
                                             onClick={addExperience}
                                             aria-label="Add experience entry"
@@ -644,7 +647,7 @@ export function ResumeEditor() {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
                                                         Description
                                                     </label>
                                                     <textarea
@@ -652,7 +655,8 @@ export function ResumeEditor() {
                                                         onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
                                                         placeholder="Describe your responsibilities and achievements..."
                                                         rows={3}
-                                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                                        className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                                        style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
                                                     />
                                                 </div>
                                                 <button
@@ -675,9 +679,9 @@ export function ResumeEditor() {
                         {currentStep === 2 && (
                             <>
                                 {/* Skills Section */}
-                                <div className="bg-white rounded-lg shadow p-4">
+                                <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
                                     <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-lg font-semibold text-slate-900">Skills</h2>
+                                        <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Skills</h2>
                                         <button
                                             onClick={addSkill}
                                             aria-label="Add skill entry"
@@ -698,13 +702,14 @@ export function ResumeEditor() {
                                                         placeholder="React"
                                                     />
                                                     <div>
-                                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
                                                             Proficiency
                                                         </label>
                                                         <select
                                                             value={skill.proficiency}
                                                             onChange={(e) => updateSkill(skill.id, 'proficiency', e.target.value)}
-                                                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                                            className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                                            style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
                                                         >
                                                             <option>Beginner</option>
                                                             <option>Intermediate</option>
