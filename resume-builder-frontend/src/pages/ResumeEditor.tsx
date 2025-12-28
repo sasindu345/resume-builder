@@ -10,12 +10,10 @@ import { motion } from 'framer-motion';
 import { TemplateName, ThemeName, TEMPLATES, THEMES } from '@/types/template';
 import { TemplateIcon } from '@/components/common/TemplateIcon';
 import { ColorSwatch } from '@/components/common/ColorSwatch';
-import editorStyles from '../styles/pages/ResumeEditor.module.css';
 import previewStyles from '../styles/editor/ResumePreview.module.css';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-// ✅ FIXED: Extended interface to include all fields used in UI
 export interface ResumeData {
     title: string;
     template: TemplateName;
@@ -43,7 +41,6 @@ export interface ResumeData {
         startDate: string;
         endDate: string;
         description: string;
-        // ✅ ADDED: Fields that were previously untyped
         responsibilities?: string;
         technologies?: string;
         achievements?: string;
@@ -72,6 +69,12 @@ const defaultResumeData: ResumeData = {
 };
 
 export function ResumeEditor() {
+    const [expandedExperienceId, setExpandedExperienceId] = useState<string | null>(null);
+    const [expandedEducationId, setExpandedEducationId] = useState<string | null>(null);
+    const [newSkillName, setNewSkillName] = useState('');
+    const [newSkillLevel, setNewSkillLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'>('Intermediate');
+    const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
+
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
@@ -85,7 +88,6 @@ export function ResumeEditor() {
     const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
     const previewRef = useRef<HTMLDivElement>(null);
 
-    // ✅ FIXED: Step configuration now matches actual rendering logic
     const steps = [
         { title: 'Title & Design', description: 'Choose a title, template, and color' },
         { title: 'Personal Info', description: 'Basic information and summary' },
@@ -94,7 +96,62 @@ export function ResumeEditor() {
         { title: 'Skills', description: 'Professional skills and proficiency' },
     ];
 
-    // Keyboard shortcuts
+    const addSkill = useCallback(() => {
+        const trimmedName = newSkillName.trim();
+        if (!trimmedName) {
+            toast.error('Please enter a skill name');
+            return;
+        }
+
+        const newSkill = {
+            id: Date.now().toString(),
+            name: trimmedName,
+            proficiency: newSkillLevel,
+        };
+
+        setResumeData((prev) => ({
+            ...prev,
+            skills: [...prev.skills, newSkill],
+        }));
+
+        setNewSkillName('');
+        setNewSkillLevel('Intermediate');
+    }, [newSkillName, newSkillLevel]);
+
+    const addEducation = useCallback(() => {
+        const newEducation = {
+            id: Date.now().toString(),
+            degree: '',
+            institution: '',
+            fieldOfStudy: '',
+            startDate: '',
+            endDate: '',
+            gpa: '',
+        };
+        setResumeData((prev) => ({
+            ...prev,
+            education: [...prev.education, newEducation],
+        }));
+    }, []);
+
+    const addExperience = useCallback(() => {
+        const newExperience = {
+            id: Date.now().toString(),
+            jobTitle: '',
+            company: '',
+            startDate: '',
+            endDate: '',
+            description: '',
+            responsibilities: '',
+            technologies: '',
+            achievements: '',
+        };
+        setResumeData((prev) => ({
+            ...prev,
+            experience: [...prev.experience, newExperience],
+        }));
+    }, []);
+
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
             const isMeta = e.metaKey || e.ctrlKey;
@@ -126,9 +183,8 @@ export function ResumeEditor() {
         };
         window.addEventListener('keydown', onKeyDown);
         return () => window.removeEventListener('keydown', onKeyDown);
-    }, []);
+    }, [addEducation, addExperience, addSkill]);
 
-    // Fetch resume data
     useEffect(() => {
         const fetchResume = async () => {
             if (!id) return;
@@ -156,7 +212,6 @@ export function ResumeEditor() {
         fetchResume();
     }, [id]);
 
-    // Auto-save with debounce
     const autoSave = useCallback(async () => {
         if (!id) return;
         try {
@@ -176,7 +231,6 @@ export function ResumeEditor() {
         }
     }, [id, resumeData]);
 
-    // Debounced auto-save
     useEffect(() => {
         if (saveTimeoutRef.current) {
             clearTimeout(saveTimeoutRef.current);
@@ -199,22 +253,6 @@ export function ResumeEditor() {
         }));
     };
 
-    const addEducation = () => {
-        const newEducation = {
-            id: Date.now().toString(),
-            degree: '',
-            institution: '',
-            fieldOfStudy: '',
-            startDate: '',
-            endDate: '',
-            gpa: '',
-        };
-        setResumeData((prev) => ({
-            ...prev,
-            education: [...prev.education, newEducation],
-        }));
-    };
-
     const updateEducation = (id: string, field: keyof ResumeData['education'][0], value: string) => {
         setResumeData((prev) => ({
             ...prev,
@@ -231,24 +269,6 @@ export function ResumeEditor() {
         }));
     };
 
-    const addExperience = () => {
-        const newExperience = {
-            id: Date.now().toString(),
-            jobTitle: '',
-            company: '',
-            startDate: '',
-            endDate: '',
-            description: '',
-            responsibilities: '',
-            technologies: '',
-            achievements: '',
-        };
-        setResumeData((prev) => ({
-            ...prev,
-            experience: [...prev.experience, newExperience],
-        }));
-    };
-
     const updateExperience = (id: string, field: keyof ResumeData['experience'][0], value: string) => {
         setResumeData((prev) => ({
             ...prev,
@@ -262,18 +282,6 @@ export function ResumeEditor() {
         setResumeData((prev) => ({
             ...prev,
             experience: prev.experience.filter((exp) => exp.id !== id),
-        }));
-    };
-
-    const addSkill = () => {
-        const newSkill = {
-            id: Date.now().toString(),
-            name: '',
-            proficiency: 'Intermediate' as const,
-        };
-        setResumeData((prev) => ({
-            ...prev,
-            skills: [...prev.skills, newSkill],
         }));
     };
 
@@ -307,7 +315,7 @@ export function ResumeEditor() {
                 backgroundColor: '#ffffff',
             });
 
-            const imgWidth = 210; // A4 width in mm
+            const imgWidth = 210;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
             const pdf = new jsPDF({
@@ -331,10 +339,8 @@ export function ResumeEditor() {
         }
     };
 
-    // ✅ FIXED: Handle finish action properly
     const handleFinishOrNext = async () => {
         if (currentStep === steps.length - 1) {
-            // Final step - ensure save then navigate
             await autoSave();
             toast.success('Resume saved successfully!');
             navigate('/dashboard');
@@ -366,7 +372,6 @@ export function ResumeEditor() {
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
-            {/* Header */}
             <div className="sticky top-0 z-40 border-b shadow-sm" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <button
@@ -400,9 +405,7 @@ export function ResumeEditor() {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="max-w-7xl mx-auto p-2 sm:p-3">
-                {/* Step Progress Indicator */}
                 <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-3 sm:p-4 mb-3 sm:mb-4 border">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                         <h3 style={{ color: 'var(--text)' }} className="text-xs sm:text-sm font-medium">
@@ -434,14 +437,12 @@ export function ResumeEditor() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_820px] gap-6 items-start">
-                    {/* Left: Form */}
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3 }}
                         className="space-y-4"
                     >
-                        {/* ✅ FIXED: Step 0 - Title & Design ONLY */}
                         {currentStep === 0 && (
                             <>
                                 <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
@@ -455,45 +456,62 @@ export function ResumeEditor() {
 
                                 <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
                                     <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>Design</h2>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
-                                                Template
+                                                Template Style
                                             </label>
-                                            <div className="flex gap-2 flex-wrap">
+                                            <select
+                                                value={resumeData.template}
+                                                onChange={(e) => setResumeData({ ...resumeData, template: e.target.value as TemplateName })}
+                                                className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
+                                                style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                            >
                                                 {Object.entries(TEMPLATES).map(([key, config]) => (
-                                                    <TemplateIcon
-                                                        key={key}
-                                                        icon={<span style={{ fontSize: 20 }}>{config.displayName[0]}</span>}
-                                                        selected={resumeData.template === key}
-                                                        onClick={() => setResumeData({ ...resumeData, template: key as TemplateName })}
-                                                        label={config.displayName}
-                                                    />
+                                                    <option key={key} value={key}>
+                                                        {config.displayName}
+                                                    </option>
                                                 ))}
-                                            </div>
+                                            </select>
+                                            <p className="text-xs mt-1.5" style={{ color: 'var(--muted)' }}>
+                                                Choose a layout style that best suits your professional profile
+                                            </p>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
                                                 Color Theme
                                             </label>
-                                            <div className="flex gap-2 flex-wrap">
+                                            <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
                                                 {Object.entries(THEMES).map(([key, theme]) => (
-                                                    <ColorSwatch
+                                                    <button
                                                         key={key}
-                                                        color={theme.primary}
-                                                        selected={resumeData.theme === key}
                                                         onClick={() => setResumeData({ ...resumeData, theme: key as ThemeName })}
-                                                        label={key.charAt(0).toUpperCase() + key.slice(1)}
-                                                    />
+                                                        className="flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:scale-105"
+                                                        style={{
+                                                            borderColor: resumeData.theme === key ? theme.primary : 'var(--border)',
+                                                            background: resumeData.theme === key ? `${theme.primary}10` : 'var(--surface)',
+                                                        }}
+                                                        title={key.charAt(0).toUpperCase() + key.slice(1)}
+                                                    >
+                                                        <div
+                                                            className="w-8 h-8 rounded-full shadow-sm"
+                                                            style={{ background: theme.primary }}
+                                                        />
+                                                        <span className="text-xs font-medium capitalize" style={{ color: 'var(--text)' }}>
+                                                            {key}
+                                                        </span>
+                                                    </button>
                                                 ))}
                                             </div>
+                                            <p className="text-xs mt-1.5" style={{ color: 'var(--muted)' }}>
+                                                Select a color scheme to personalize your resume
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </>
                         )}
 
-                        {/* ✅ FIXED: Step 1 - Personal Information ONLY */}
                         {currentStep === 1 && (
                             <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
                                 <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>Personal Information</h2>
@@ -540,7 +558,6 @@ export function ResumeEditor() {
                             </div>
                         )}
 
-                        {/* ✅ FIXED: Step 2 - Experience ONLY */}
                         {currentStep === 2 && (
                             <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
                                 <div className="flex items-center justify-between mb-4">
@@ -554,98 +571,124 @@ export function ResumeEditor() {
                                         Add
                                     </button>
                                 </div>
-                                <div className="space-y-4">
-                                    {resumeData.experience.map((exp) => (
-                                        <div key={exp.id} className="border rounded-lg p-4 space-y-3" style={{ borderColor: 'var(--border)' }}>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <Input
-                                                    label="Job Title"
-                                                    value={exp.jobTitle}
-                                                    onChange={(e) => updateExperience(exp.id, 'jobTitle', e.target.value)}
-                                                    placeholder="Software Engineer"
-                                                />
-                                                <Input
-                                                    label="Company"
-                                                    value={exp.company}
-                                                    onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
-                                                    placeholder="Company Name"
-                                                />
+                                <div style={{ maxHeight: '65vh', overflowY: 'auto' }} className="space-y-2 pr-1">
+                                    {resumeData.experience.map((exp) => {
+                                        const expanded = expandedExperienceId === exp.id;
+                                        return (
+                                            <div key={exp.id} className="border rounded-lg" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+                                                <button
+                                                    type="button"
+                                                    className="w-full flex items-center justify-between px-4 py-2 text-left hover:bg-blue-50 focus:bg-blue-100 transition-colors rounded-t-lg"
+                                                    style={{ color: 'var(--text)', fontWeight: 500, outline: 'none', borderBottom: expanded ? '1px solid var(--border)' : 'none' }}
+                                                    onClick={() => setExpandedExperienceId(expanded ? null : exp.id)}
+                                                >
+                                                    <span>
+                                                        {exp.jobTitle || <span className="italic text-slate-400">(No title)</span>} — {exp.company || <span className="italic text-slate-400">(No company)</span>}
+                                                        <span className="ml-2 text-xs text-slate-500">{exp.startDate} - {exp.endDate || 'Present'}</span>
+                                                    </span>
+                                                    <span className="ml-2 text-xs text-blue-600">{expanded ? 'Collapse' : 'Expand'}</span>
+                                                </button>
+                                                {expanded && (
+                                                    <div className="p-4 space-y-3">
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <Input
+                                                                label="Job Title"
+                                                                value={exp.jobTitle}
+                                                                onChange={(e) => updateExperience(exp.id, 'jobTitle', e.target.value)}
+                                                                placeholder="Software Engineer"
+                                                            />
+                                                            <Input
+                                                                label="Company"
+                                                                value={exp.company}
+                                                                onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
+                                                                placeholder="Company Name"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <div>
+                                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Start Date</label>
+                                                                <input
+                                                                    type="month"
+                                                                    value={exp.startDate}
+                                                                    onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
+                                                                    className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
+                                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>End Date</label>
+                                                                <input
+                                                                    type="month"
+                                                                    value={exp.endDate}
+                                                                    onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
+                                                                    placeholder="Leave empty for current"
+                                                                    className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
+                                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
+                                                                Description
+                                                            </label>
+                                                            <textarea
+                                                                value={exp.description}
+                                                                onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
+                                                                placeholder="Brief overview of your role..."
+                                                                rows={2}
+                                                                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                                                style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
+                                                                Key Responsibilities
+                                                            </label>
+                                                            <textarea
+                                                                value={exp.responsibilities || ''}
+                                                                onChange={(e) => updateExperience(exp.id, 'responsibilities', e.target.value)}
+                                                                placeholder="Main responsibilities and duties..."
+                                                                rows={2}
+                                                                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                                                style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                            />
+                                                        </div>
+                                                        <Input
+                                                            label="Technologies Used"
+                                                            value={exp.technologies || ''}
+                                                            onChange={(e) => updateExperience(exp.id, 'technologies', e.target.value)}
+                                                            placeholder="e.g. React, Node.js, AWS"
+                                                        />
+                                                        <div>
+                                                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
+                                                                Key Achievements
+                                                            </label>
+                                                            <textarea
+                                                                value={exp.achievements || ''}
+                                                                onChange={(e) => updateExperience(exp.id, 'achievements', e.target.value)}
+                                                                placeholder="Measurable achievements and impact..."
+                                                                rows={2}
+                                                                className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                                                style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            onClick={() => removeExperience(exp.id)}
+                                                            aria-label="Remove experience entry"
+                                                            className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors text-sm"
+                                                        >
+                                                            <TrashIcon className="h-4 w-4" />
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <Input
-                                                    label="Start Date"
-                                                    type="month"
-                                                    value={exp.startDate}
-                                                    onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
-                                                />
-                                                <Input
-                                                    label="End Date"
-                                                    type="month"
-                                                    value={exp.endDate}
-                                                    onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
-                                                    placeholder="Leave empty for current"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
-                                                    Description
-                                                </label>
-                                                <textarea
-                                                    value={exp.description}
-                                                    onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
-                                                    placeholder="Brief overview of your role..."
-                                                    rows={2}
-                                                    className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
-                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
-                                                    Key Responsibilities
-                                                </label>
-                                                <textarea
-                                                    value={exp.responsibilities || ''}
-                                                    onChange={(e) => updateExperience(exp.id, 'responsibilities', e.target.value)}
-                                                    placeholder="Main responsibilities and duties..."
-                                                    rows={2}
-                                                    className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
-                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
-                                                />
-                                            </div>
-                                            <Input
-                                                label="Technologies Used"
-                                                value={exp.technologies || ''}
-                                                onChange={(e) => updateExperience(exp.id, 'technologies', e.target.value)}
-                                                placeholder="e.g. React, Node.js, AWS"
-                                            />
-                                            <div>
-                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
-                                                    Key Achievements
-                                                </label>
-                                                <textarea
-                                                    value={exp.achievements || ''}
-                                                    onChange={(e) => updateExperience(exp.id, 'achievements', e.target.value)}
-                                                    placeholder="Measurable achievements and impact..."
-                                                    rows={2}
-                                                    className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
-                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
-                                                />
-                                            </div>
-                                            <button
-                                                onClick={() => removeExperience(exp.id)}
-                                                aria-label="Remove experience entry"
-                                                className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors text-sm"
-                                            >
-                                                <TrashIcon className="h-4 w-4" />
-                                                Remove
-                                            </button>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
 
-                        {/* ✅ FIXED: Step 3 - Education ONLY */}
                         {currentStep === 3 && (
                             <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
                                 <div className="flex items-center justify-between mb-4">
@@ -659,117 +702,214 @@ export function ResumeEditor() {
                                         Add
                                     </button>
                                 </div>
-                                <div className="space-y-4">
-                                    {resumeData.education.map((edu) => (
-                                        <div key={edu.id} className="p-4 border rounded-lg space-y-3" style={{ borderColor: 'var(--border)' }}>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <Input
-                                                    label="Degree"
-                                                    value={edu.degree}
-                                                    onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
-                                                    placeholder="Bachelor's"
-                                                />
-                                                <Input
-                                                    label="Institution"
-                                                    value={edu.institution}
-                                                    onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)}// Continuing from Step 3 Education section...
-                                                    placeholder="University Name"
-                                                />
+                                <div style={{ maxHeight: '65vh', overflowY: 'auto' }} className="space-y-2 pr-1">
+                                    {resumeData.education.map((edu) => {
+                                        const expanded = expandedEducationId === edu.id;
+                                        return (
+                                            <div key={edu.id} className="border rounded-lg" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+                                                <button
+                                                    type="button"
+                                                    className="w-full flex items-center justify-between px-4 py-2 text-left hover:bg-blue-50 focus:bg-blue-100 transition-colors rounded-t-lg"
+                                                    style={{ color: 'var(--text)', fontWeight: 500, outline: 'none', borderBottom: expanded ? '1px solid var(--border)' : 'none' }}
+                                                    onClick={() => setExpandedEducationId(expanded ? null : edu.id)}
+                                                >
+                                                    <span>
+                                                        {edu.degree || <span className="italic text-slate-400">(No degree)</span>} — {edu.institution || <span className="italic text-slate-400">(No institution)</span>}
+                                                        <span className="ml-2 text-xs text-slate-500">{edu.startDate} - {edu.endDate || 'Present'}</span>
+                                                    </span>
+                                                    <span className="ml-2 text-xs text-blue-600">{expanded ? 'Collapse' : 'Expand'}</span>
+                                                </button>
+                                                {expanded && (
+                                                    <div className="p-4 space-y-3">
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <Input
+                                                                label="Degree"
+                                                                value={edu.degree}
+                                                                onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
+                                                                placeholder="Bachelor's"
+                                                            />
+                                                            <Input
+                                                                label="Institution"
+                                                                value={edu.institution}
+                                                                onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)}
+                                                                placeholder="University Name"
+                                                            />
+                                                        </div>
+                                                        <Input
+                                                            label="Field of Study"
+                                                            value={edu.fieldOfStudy}
+                                                            onChange={(e) => updateEducation(edu.id, 'fieldOfStudy', e.target.value)}
+                                                            placeholder="Computer Science"
+                                                        />
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <div>
+                                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Start Date</label>
+                                                                <input
+                                                                    type="month"
+                                                                    value={edu.startDate}
+                                                                    onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
+                                                                    className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
+                                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>End Date</label>
+                                                                <input
+                                                                    type="month"
+                                                                    value={edu.endDate}
+                                                                    onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
+                                                                    className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
+                                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <Input
+                                                            label="GPA (Optional)"
+                                                            value={edu.gpa}
+                                                            onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
+                                                            placeholder="3.8"
+                                                        />
+                                                        <button
+                                                            onClick={() => removeEducation(edu.id)}
+                                                            aria-label="Remove education entry"
+                                                            className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors text-sm"
+                                                        >
+                                                            <TrashIcon className="h-4 w-4" />
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <Input
-                                                label="Field of Study"
-                                                value={edu.fieldOfStudy}
-                                                onChange={(e) => updateEducation(edu.id, 'fieldOfStudy', e.target.value)}
-                                                placeholder="Computer Science"
-                                            />
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <Input
-                                                    label="Start Date"
-                                                    type="month"
-                                                    value={edu.startDate}
-                                                    onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
-                                                />
-                                                <Input
-                                                    label="End Date"
-                                                    type="month"
-                                                    value={edu.endDate}
-                                                    onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
-                                                />
-                                            </div>
-                                            <Input
-                                                label="GPA (Optional)"
-                                                value={edu.gpa}
-                                                onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
-                                                placeholder="3.8"
-                                            />
-                                            <button
-                                                onClick={() => removeEducation(edu.id)}
-                                                aria-label="Remove education entry"
-                                                className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors text-sm"
-                                            >
-                                                <TrashIcon className="h-4 w-4" />
-                                                Remove
-                                            </button>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
 
-                        {/* ✅ FIXED: Step 4 - Skills ONLY */}
                         {currentStep === 4 && (
                             <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Skills</h2>
-                                    <button
-                                        onClick={addSkill}
-                                        aria-label="Add skill entry"
-                                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                                    >
-                                        <PlusIcon className="h-5 w-5" />
-                                        Add
-                                    </button>
+                                <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>Skills</h2>
+
+                                <div className="mb-4 p-3 rounded-lg border" style={{ borderColor: 'var(--border)', background: 'var(--bg)' }}>
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                        <input
+                                            type="text"
+                                            value={newSkillName}
+                                            onChange={(e) => setNewSkillName(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    addSkill();
+                                                }
+                                            }}
+                                            placeholder="Skill name (e.g., JavaScript)"
+                                            className="flex-1 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
+                                            style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                        />
+                                        <select
+                                            value={newSkillLevel}
+                                            onChange={(e) => setNewSkillLevel(e.target.value as typeof newSkillLevel)}
+                                            className="px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
+                                            style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                        >
+                                            <option value="Beginner">Beginner</option>
+                                            <option value="Intermediate">Intermediate</option>
+                                            <option value="Advanced">Advanced</option>
+                                            <option value="Expert">Expert</option>
+                                        </select>
+                                        <button
+                                            onClick={addSkill}
+                                            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                        >
+                                            <PlusIcon className="h-4 w-4" />
+                                            Add
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="space-y-3">
-                                    {resumeData.skills.map((skill) => (
-                                        <div key={skill.id} className="flex items-end gap-3">
-                                            <div className="flex-1 grid grid-cols-2 gap-2">
-                                                <Input
-                                                    label="Skill"
-                                                    value={skill.name}
-                                                    onChange={(e) => updateSkill(skill.id, 'name', e.target.value)}
-                                                    placeholder="React"
-                                                />
-                                                <div>
-                                                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
-                                                        Proficiency
-                                                    </label>
+
+                                <div className="flex flex-wrap gap-2">
+                                    {resumeData.skills.map((skill) => {
+                                        const isEditing = editingSkillId === skill.id;
+
+                                        if (isEditing) {
+                                            return (
+                                                <div key={skill.id} className="flex items-center gap-2 bg-blue-50 border-2 border-blue-400 rounded-full px-3 py-1">
+                                                    <input
+                                                        type="text"
+                                                        value={skill.name}
+                                                        onChange={(e) => updateSkill(skill.id, 'name', e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                setEditingSkillId(null);
+                                                            }
+                                                            if (e.key === 'Escape') {
+                                                                setEditingSkillId(null);
+                                                            }
+                                                        }}
+                                                        className="w-32 px-2 py-0.5 rounded text-sm border-0 focus:ring-1 focus:ring-blue-500 outline-none"
+                                                        style={{ background: 'white', color: 'var(--text)' }}
+                                                        autoFocus
+                                                    />
                                                     <select
                                                         value={skill.proficiency}
                                                         onChange={(e) => updateSkill(skill.id, 'proficiency', e.target.value)}
-                                                        className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                                        style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                        className="text-xs px-1 py-0.5 rounded border-0 focus:ring-1 focus:ring-blue-500 outline-none"
+                                                        style={{ background: 'white', color: 'var(--text)' }}
                                                     >
-                                                        <option>Beginner</option>
-                                                        <option>Intermediate</option>
-                                                        <option>Advanced</option>
-                                                        <option>Expert</option>
+                                                        <option value="Beginner">Beginner</option>
+                                                        <option value="Intermediate">Intermediate</option>
+                                                        <option value="Advanced">Advanced</option>
+                                                        <option value="Expert">Expert</option>
                                                     </select>
+                                                    <button
+                                                        onClick={() => setEditingSkillId(null)}
+                                                        className="text-green-600 hover:text-green-700 transition-colors text-xs font-medium"
+                                                        title="Done editing"
+                                                    >
+                                                        ✓
+                                                    </button>
                                                 </div>
-                                            </div>
-                                            <button
-                                                onClick={() => removeSkill(skill.id)}
-                                                className="text-red-600 hover:text-red-700 transition-colors"
+                                            );
+                                        }
+
+                                        return (
+                                            <div
+                                                key={skill.id}
+                                                className="flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1 group hover:bg-slate-200 transition-colors cursor-pointer"
+                                                onClick={() => setEditingSkillId(skill.id)}
+                                                title="Click to edit"
                                             >
-                                                <TrashIcon className="h-5 w-5" />
-                                            </button>
-                                        </div>
-                                    ))}
+                                                <span className="font-medium text-sm" style={{ color: 'var(--text)' }}>
+                                                    {skill.name}
+                                                </span>
+                                                <span className="text-xs text-slate-500">
+                                                    {skill.proficiency}
+                                                </span>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        removeSkill(skill.id);
+                                                    }}
+                                                    className="text-red-600 hover:text-red-700 transition-colors ml-1 opacity-0 group-hover:opacity-100"
+                                                    style={{ lineHeight: 1 }}
+                                                    title="Remove skill"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
+
+                                {resumeData.skills.length === 0 && (
+                                    <p className="text-sm text-slate-400 italic mt-2">
+                                        No skills added yet. Use the form above to add your first skill.
+                                    </p>
+                                )}
                             </div>
                         )}
 
-                        {/* Navigation Buttons */}
                         <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-3 sm:p-4 border">
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
                                 <button
@@ -801,7 +941,6 @@ export function ResumeEditor() {
                         </div>
                     </motion.div>
 
-                    {/* ✅ FIXED: Preview layout - removed sticky, removed max-height, removed internal scroll */}
                     <motion.aside
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}

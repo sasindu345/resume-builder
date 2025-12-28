@@ -194,27 +194,7 @@ export function Dashboard() {
                 {/* Stats Cards */}
                 {stats && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div className="rounded-lg p-6 border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                            <p className="text-sm font-medium" style={{ color: 'var(--muted)' }}>Total Resumes</p>
-                            <p className="text-4xl font-bold text-blue-600 mt-2">
-                                {stats.totalResumes}
-                            </p>
-                        </div>
-                        <div className="rounded-lg p-6 border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                            <p className="text-sm font-medium" style={{ color: 'var(--muted)' }}>Completed</p>
-                            <p className="text-4xl font-bold text-green-600 mt-2">
-                                {stats.completedResumes}
-                            </p>
-                        </div>
-                        <div className="rounded-lg p-6 border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                            <p className="text-sm font-medium" style={{ color: 'var(--muted)' }}>Completion Rate</p>
-                            <p className="text-4xl font-bold text-purple-600 mt-2">
-                                {stats.totalResumes > 0
-                                    ? Math.round((stats.completedResumes / stats.totalResumes) * 100)
-                                    : 0}
-                                %
-                            </p>
-                        </div>
+                        {/* Stat cards removed as requested */}
                     </div>
                 )}
 
