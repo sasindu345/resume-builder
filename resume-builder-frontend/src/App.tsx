@@ -43,7 +43,7 @@ function AppRoutes() {
 
       <header className={headerStyles.header}>
         <div className={headerStyles.headerContent}>
-          <Link to="/" className={headerStyles.logo}>ResumeBuilder · Phase 1</Link>
+          <Link to="/" className={headerStyles.logo}>ResumeBuilder</Link>
           <nav className={headerStyles.nav}>
             <Link to="/login" className={headerStyles.navLink}>Log in</Link>
             <Link to="/register" className={headerStyles.navLink}>Build my resume</Link>
