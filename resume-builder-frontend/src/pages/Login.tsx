@@ -115,19 +115,9 @@ export const Login = () => {
                         Sign in
                     </Button>
 
-                    {/* Divider */}
-                    <div className="my-6 flex items-center gap-3">
-                        <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
-                        <span className="text-xs font-medium" style={{ color: 'var(--muted)' }}>OR</span>
-                        <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
-                    </div>
+                    {/* Removed visual divider */}
 
-                    {/* Demo Credentials (Development) */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
-                        <p className="font-semibold mb-1">Demo Account (Dev Only)</p>
-                        <p>Email: demo@example.com</p>
-                        <p>Password: password123</p>
-                    </div>
+                    {/* Removed demo credentials for production-readiness */}
                 </form>
 
                 {/* Footer */}
