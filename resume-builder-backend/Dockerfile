@@ -1,8 +1,19 @@
+# ----------- BUILD STAGE -----------
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+WORKDIR /build
+
+COPY pom.xml .
+COPY src ./src
+
+RUN ./mvnw package -DskipTests || mvn package -DskipTests
+
+# ----------- RUNTIME STAGE ----------
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-COPY target/*.jar app.jar
+COPY --from=builder /build/target/*.jar app.jar
 
 EXPOSE 8080
 
