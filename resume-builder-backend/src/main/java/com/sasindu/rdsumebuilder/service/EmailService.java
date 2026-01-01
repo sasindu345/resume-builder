@@ -30,10 +30,10 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.frontend.url}")
+    @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username:}")
     private String fromEmail;
 
     /**
