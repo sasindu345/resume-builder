@@ -235,3 +235,6 @@ For support, email support@resumebuilder.com or open an issue in the repository.
 - [Documentation](https://docs.resumebuilder.com)
 - [Report Bug](https://github.com/your-repo/issues)
 - [Request Feature](https://github.com/your-repo/issues)
+
+
+VITE_API_BASE_URL=VITE_API_URL=https://your-backend.onrender.comx
