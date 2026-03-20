@@ -13,6 +13,7 @@ import { Input } from '@/components/common/Input'
 import { FloatingShapes } from '@/components/animations/FloatingShapes'
 import toast from 'react-hot-toast'
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const loginSchema = z.object({
     email: z.string().email('Please enter a valid email address'),
@@ -43,10 +44,11 @@ export const Login = () => {
             await login(data.email, data.password)
             toast.success('Welcome back!')
             navigate('/dashboard')
-        } catch (error: any) {
-            const errorMessage = error?.response?.data?.message ||
-                error?.message ||
+        } catch (error: unknown) {
+            const errorMessage = getApiErrorMessage(
+                error,
                 'Login failed. Please check your credentials.'
+            )
             toast.error(errorMessage, { duration: 5000 })
         } finally {
             setIsLoading(false)

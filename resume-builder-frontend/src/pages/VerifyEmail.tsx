@@ -10,6 +10,7 @@ import { verifyEmail } from '@/services/authService'
 import { Button } from '@/components/common/Button'
 import { FloatingShapes } from '@/components/animations/FloatingShapes'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 export const VerifyEmail = () => {
     const navigate = useNavigate()
@@ -35,12 +36,13 @@ export const VerifyEmail = () => {
 
                 // Auto-redirect to login after 3 seconds
                 setTimeout(() => navigate('/login'), 3000)
-            } catch (error: any) {
+            } catch (error: unknown) {
                 setStatus('error')
                 setMessage(
-                    error?.response?.data?.message ||
-                    error?.message ||
-                    'Verification failed. The link may have expired or is invalid.'
+                    getApiErrorMessage(
+                        error,
+                        'Verification failed. The link may have expired or is invalid.'
+                    )
                 )
             }
         }

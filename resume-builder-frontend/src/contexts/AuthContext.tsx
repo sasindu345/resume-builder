@@ -4,6 +4,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { setToken, getToken, removeToken, setUser, getUser, removeUser } from '@/utils/tokenStorage'
+import { getApiErrorMessage } from '@/utils/apiError'
 import { loginUser, registerUser } from '@/services/authService'
 
 /**
@@ -86,12 +87,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
             setUser(userData)
             setUserState(userData)
-        } catch (err: any) {
-            const message = typeof err?.response?.data?.message === 'string'
-                ? err.response.data.message
-                : typeof err?.message === 'string'
-                    ? err.message
-                    : 'Login failed'
+        } catch (err: unknown) {
+            const message = getApiErrorMessage(err, 'Login failed')
             setError(message)
             throw err
         } finally {
@@ -117,12 +114,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             // Registration succeeds but user must verify email before logging in
             // Do NOT auto-login - just return success
-        } catch (err: any) {
-            const message = typeof err?.response?.data?.message === 'string'
-                ? err.response.data.message
-                : typeof err?.message === 'string'
-                    ? err.message
-                    : 'Registration failed'
+        } catch (err: unknown) {
+            const message = getApiErrorMessage(err, 'Registration failed')
             setError(message)
             throw err
         } finally {

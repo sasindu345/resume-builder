@@ -13,6 +13,7 @@ import { Input } from '@/components/common/Input'
 import { FloatingShapes } from '@/components/animations/FloatingShapes'
 import toast from 'react-hot-toast'
 import { UserIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon } from '@heroicons/react/24/outline'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const registerSchema = z.object({
     firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -59,8 +60,9 @@ export const Register = () => {
             // Don't navigate - user must verify email first
             // Redirect to login page after showing success message
             setTimeout(() => navigate('/login'), 2000)
-        } catch (error: any) {
-            toast.error(error?.message || 'Registration failed. Please try again.')
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error, 'Registration failed. Please try again.')
+            toast.error(message)
         } finally {
             setIsLoading(false)
         }
