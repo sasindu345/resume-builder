@@ -8,8 +8,6 @@ import { Input } from '@/components/common/Input';
 import { ResumePreview } from '@/components/resume-editor/ResumePreview';
 import { motion } from 'framer-motion';
 import { TemplateName, ThemeName, TEMPLATES, THEMES } from '@/types/template';
-import { TemplateIcon } from '@/components/common/TemplateIcon';
-import { ColorSwatch } from '@/components/common/ColorSwatch';
 import previewStyles from '../styles/editor/ResumePreview.module.css';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
