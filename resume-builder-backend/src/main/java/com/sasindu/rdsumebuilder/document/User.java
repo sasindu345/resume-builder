@@ -60,6 +60,9 @@ public class User {
     private Boolean isLocked = false;
 
     @Builder.Default
+    private String role = "USER";
+
+    @Builder.Default
     private Integer failedLoginAttempts = 0;
 
     @CreatedDate

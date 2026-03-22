@@ -35,10 +35,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                                 .password(user.getPassword())
 
                                 // Authorities (roles/permissions)
-                                // For now, all users have "ROLE_USER"
-                                // Premium users get "ROLE_PREMIUM" (we can add this later)
                                 // Spring Security requires "ROLE_" prefix
-                                .authorities("ROLE_USER")
+                                // We dynamically get the role from the User document (e.g., "USER" or "SUPER_ADMIN")
+                                .authorities("ROLE_" + user.getRole())
 
                                 // Account status flags
                                 // accountExpired(false) - Account never expires

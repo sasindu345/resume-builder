@@ -79,24 +79,24 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
-        if (user.getIsLocked()) {
+        if (Boolean.TRUE.equals(user.getIsLocked())) {
             throw new RuntimeException("Account is locked due to multiple failed login attempts");
         }
 
-        if (!user.getIsActive()) {
+        if (Boolean.FALSE.equals(user.getIsActive())) {
             throw new RuntimeException("Account is deactivated");
         }
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (user.getPassword() == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             handleFailedLogin(user);
             throw new RuntimeException("Invalid email or password");
         }
 
-        if (!user.getIsEmailVerified()) {
+        if (Boolean.FALSE.equals(user.getIsEmailVerified()) && user.getIsEmailVerified() != null) {
             throw new RuntimeException("Please verify your email first");
         }
 
-        if (user.getFailedLoginAttempts() > 0) {
+        if (user.getFailedLoginAttempts() != null && user.getFailedLoginAttempts() > 0) {
             user.setFailedLoginAttempts(0);
             userRepository.save(user);
         }

@@ -12,6 +12,10 @@ A modern, full-stack resume builder application with professional templates, rea
 - **Responsive Design** - Works perfectly on all devices
 - **Dark Mode** - Eye-friendly dark theme support
 
+## 🔑 Default Admin Account (Temporary)
+- **Email:** `admin@gmail.com`
+- **Password:** `admin123`
+
 ## 📁 Project Structure
 
 ```
