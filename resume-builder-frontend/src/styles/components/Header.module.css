@@ -1,133 +1,188 @@
-/* Header Component Styling (Phase 5 Polish) */
+/* Header Component Styling — Professional SaaS Navbar */
 
 .header {
     position: sticky;
     top: 0;
-    z-index: 40;
-    background: var(--surface);
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
+    box-shadow: 0 1px 0 var(--border), 0 4px 20px rgba(0, 0, 0, 0.04);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="dark"] .header {
+    background: rgba(15, 22, 40, 0.88);
 }
 
 .headerContent {
-    max-width: 7xl;
+    max-width: 80rem;
     margin: 0 auto;
-    padding: 1rem 1.5rem;
+    padding: 0.875rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
 }
 
+/* Logo */
 .logo {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    background: linear-gradient(135deg, var(--primary-600), var(--accent));
-    color: white;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 800;
+    font-size: 1.125rem;
+    letter-spacing: -0.03em;
     text-decoration: none;
-    transition: all 0.3s ease;
+    color: var(--text);
+    transition: opacity 0.2s ease;
 }
 
 .logo:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
+    opacity: 0.8;
 }
 
+.logoIcon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+    flex-shrink: 0;
+}
+
+.logoText {
+    background: linear-gradient(135deg, var(--primary-600), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Nav */
 .nav {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.25rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--muted);
 }
 
 .navLink {
     color: var(--muted);
     text-decoration: none;
-    transition: color 0.3s ease;
-    position: relative;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: color 0.2s ease, background 0.2s ease;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
 }
 
 .navLink:hover {
     color: var(--text);
+    background: var(--bg);
 }
 
-.navLink::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--accent);
-    transition: width 0.3s ease;
+/* CTA pill */
+.navCTA {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1.125rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35);
+    transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
-.navLink:hover::after {
-    width: 100%;
+.navCTA:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
 }
 
+.navCTA:active {
+    transform: translateY(0);
+}
+
+/* Theme toggle icon button */
 .themeToggle {
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.375rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.625rem;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
-    font-size: 0.875rem;
-    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .themeToggle:hover {
     background: var(--bg);
-    border-color: var(--accent);
-    color: var(--accent);
-    box-shadow: var(--shadow);
+    border-color: var(--primary-600);
+    color: var(--primary-600);
+    transform: rotate(12deg) scale(1.05);
 }
 
 .themeToggle:active {
-    transform: scale(0.98);
+    transform: rotate(0deg) scale(0.95);
 }
 
-/* Mobile Responsive */
+/* Divider between nav items */
+.navDivider {
+    width: 1px;
+    height: 1.25rem;
+    background: var(--border);
+    margin: 0 0.25rem;
+}
+
+/* Mobile */
 @media (max-width: 768px) {
     .headerContent {
         padding: 0.75rem 1rem;
-        flex-wrap: wrap;
-        gap: 0.5rem;
     }
 
     .nav {
-        gap: 0.5rem;
-        font-size: 0.75rem;
+        gap: 0.125rem;
+    }
+
+    .navLink {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .navCTA {
+        padding: 0.375rem 0.875rem;
+        font-size: 0.8rem;
     }
 
     .themeToggle {
-        padding: 0.375rem 0.5rem;
-        font-size: 0.75rem;
-    }
-
-    .logo {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
+        width: 2rem;
+        height: 2rem;
     }
 }
 
 @media (max-width: 480px) {
     .headerContent {
-        padding: 0.5rem 0.75rem;
+        padding: 0.625rem 0.75rem;
     }
 
-    .nav {
-        gap: 0.25rem;
-    }
-
-    .themeToggle {
-        padding: 0.25rem 0.5rem;
+    .logo {
+        font-size: 1rem;
     }
 }
