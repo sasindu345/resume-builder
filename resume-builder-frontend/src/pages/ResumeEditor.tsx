@@ -1,11 +1,15 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeftIcon, PlusIcon, TrashIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
+import { Camera, X } from 'lucide-react';
 import api from '@/services/api';
+import { uploadProfileImage } from '@/services/cloudinaryService';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { ResumePreview } from '@/components/resume-editor/ResumePreview';
+import { AIReviewPanel } from '@/components/resume-editor/AIReviewPanel';
 import { motion } from 'framer-motion';
 import { TemplateName, ThemeName, TEMPLATES, THEMES } from '@/types/template';
 import previewStyles from '../styles/editor/ResumePreview.module.css';
@@ -22,6 +26,7 @@ export interface ResumeData {
         phone: string;
         location: string;
         summary: string;
+        profileImage?: string;
     };
     education: Array<{
         id: string;
@@ -60,6 +65,7 @@ const defaultResumeData: ResumeData = {
         phone: '',
         location: '',
         summary: '',
+        profileImage: '',
     },
     education: [],
     experience: [],
@@ -85,6 +91,8 @@ export function ResumeEditor() {
     const [currentStep, setCurrentStep] = useState(0);
     const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
     const previewRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
 
     const steps = [
         { title: 'Title & Design', description: 'Choose a title, template, and color' },
@@ -92,6 +100,7 @@ export function ResumeEditor() {
         { title: 'Experience', description: 'Work history and details' },
         { title: 'Education', description: 'Academic background' },
         { title: 'Skills', description: 'Professional skills and proficiency' },
+        { title: 'AI Review', description: 'Get AI-powered feedback on your resume' },
     ];
 
     const addSkill = useCallback(() => {
@@ -514,6 +523,81 @@ export function ResumeEditor() {
                             <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
                                 <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>Personal Information</h2>
                                 <div className="space-y-4">
+                                    {/* Profile Image Upload — upgraded 120px zone */}
+                                    <div className="flex flex-col items-center gap-3 p-5 rounded-2xl border-2 border-dashed transition-colors"
+                                        style={{ borderColor: 'var(--border)', background: 'var(--bg)' }}
+                                    >
+                                        <div
+                                            className="relative w-28 h-28 rounded-full overflow-hidden cursor-pointer group"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            title="Click to upload photo"
+                                        >
+                                            {resumeData.personalInfo.profileImage ? (
+                                                <img src={resumeData.personalInfo.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--border)' }}>
+                                                    <UserCircleIcon className="w-16 h-16" style={{ color: 'var(--muted)' }} />
+                                                </div>
+                                            )}
+                                            {/* Hover overlay */}
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                                                <Camera className="w-6 h-6 text-white" />
+                                            </div>
+                                            {isUploadingImage && (
+                                                <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-full">
+                                                    <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Profile Photo</p>
+                                            <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>Optional · JPG/PNG · max 5MB</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold btn-gradient"
+                                            >
+                                                <Camera className="w-4 h-4" />
+                                                {resumeData.personalInfo.profileImage ? 'Change Photo' : 'Upload Photo'}
+                                            </button>
+                                            {resumeData.personalInfo.profileImage && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updatePersonalInfo('profileImage', '')}
+                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                    Remove
+                                                </button>
+                                            )}
+                                        </div>
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (!file) return;
+                                                if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
+                                                if (file.size > 5 * 1024 * 1024) { toast.error('Image must be less than 5MB'); return; }
+                                                try {
+                                                    setIsUploadingImage(true);
+                                                    const url = await uploadProfileImage(file);
+                                                    console.log('[resume-editor] uploaded profile image URL', url);
+                                                    updatePersonalInfo('profileImage', url);
+                                                    toast.success('Profile image uploaded!');
+                                                } catch (error) {
+                                                    console.error('[resume-editor] profile image upload failed', error);
+                                                    toast.error(error instanceof Error ? error.message : 'Failed to upload image');
+                                                } finally {
+                                                    setIsUploadingImage(false);
+                                                }
+                                            }}
+                                        />
+                                    </div>
                                     <Input
                                         label="Full Name"
                                         value={resumeData.personalInfo.fullName}
@@ -905,6 +989,13 @@ export function ResumeEditor() {
                                         No skills added yet. Use the form above to add your first skill.
                                     </p>
                                 )}
+                            </div>
+                        )}
+
+                        {currentStep === 5 && (
+                            <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
+                                <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>AI Resume Review</h2>
+                                <AIReviewPanel resumeData={resumeData} />
                             </div>
                         )}
 

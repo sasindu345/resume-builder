@@ -11,6 +11,10 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
+        if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+            delete config.headers['Content-Type']
+        }
+
         const publicEndpoints = ['/auth/register', '/auth/login', '/auth/verify-email', '/auth/forgot-password']
 
         const isPublicEndpoint = publicEndpoints.some(endpoint => {
