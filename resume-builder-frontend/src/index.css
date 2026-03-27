@@ -140,6 +140,14 @@ body {
   background-clip: text;
 }
 
+/* Feature icon boxes — theme-aware gradients */
+.feature-icon-box {
+  background: var(--light-bg);
+}
+[data-theme="dark"] .feature-icon-box {
+  background: var(--dark-bg);
+}
+
 /* Card lift on hover */
 .card-hover {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -237,6 +245,57 @@ body {
     min-height: auto;
     padding: 16px;
   }
+}
+
+/* =============================================
+   TESTIMONIAL MARQUEE
+   ============================================= */
+
+@keyframes marquee-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.marquee-row {
+  display: flex;
+  width: max-content;
+  gap: 1.5rem;
+}
+
+.marquee-left {
+  animation: marquee-left 40s linear infinite;
+}
+
+.marquee-right {
+  animation: marquee-right 40s linear infinite;
+}
+
+.marquee-container:hover .marquee-left,
+.marquee-container:hover .marquee-right {
+  animation-play-state: paused;
+}
+
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.testimonial-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-3px) scale(1.015);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .testimonial-card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
 }
 
 /* =============================================
