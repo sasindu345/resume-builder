@@ -248,7 +248,7 @@ export function Home() {
                 <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-36 pb-24">
                     <div className="text-center space-y-8">
                         {/* Badge */}
-                        <div className="animate-fade-in-up inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
+                        <div className="animate-fade-in-up inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium max-w-full"
                             style={{
                                 background: 'rgba(255,255,255,0.12)',
                                 backdropFilter: 'blur(16px)',
@@ -257,8 +257,8 @@ export function Home() {
                                 color: '#fff',
                             }}
                         >
-                            <Sparkles className="w-4 h-4" />
-                            <span>Free Professional Resume Builder — Powered by AI</span>
+                            <Sparkles className="w-4 h-4 shrink-0" />
+                            <span className="text-left leading-tight">Free Professional Resume Builder — Powered by AI</span>
                         </div>
 
                         {/* Heading */}
