@@ -95,6 +95,13 @@ function AppRoutes() {
     navigate('/')
   }
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [location.pathname])
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <FloatingShapes />
@@ -107,7 +114,7 @@ function AppRoutes() {
             <span className={headerStyles.logoText}>ResumeBuilder</span>
           </Link>
 
-          {/* Nav */}
+          {/* Desktop Nav — hidden on mobile via CSS */}
           <nav className={headerStyles.nav} aria-label="Main navigation">
             {isAuthenticated ? (
               <>
@@ -138,6 +145,53 @@ function AppRoutes() {
               {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
             </button>
           </nav>
+
+          {/* Mobile Nav — hamburger + theme toggle, visible only on mobile */}
+          <div className={headerStyles.mobileNav}>
+            <button
+              type="button"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              onClick={toggleTheme}
+              className={headerStyles.themeToggle}
+            >
+              {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+            </button>
+            <button
+              type="button"
+              aria-label="Toggle menu"
+              onClick={() => setMobileMenuOpen(v => !v)}
+              className={headerStyles.hamburger}
+            >
+              {mobileMenuOpen ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile drawer */}
+        <div className={`${headerStyles.mobileDrawer} ${mobileMenuOpen ? headerStyles.mobileDrawerOpen : ''}`}>
+          {isAuthenticated ? (
+            <>
+              <Link to="/dashboard" className={headerStyles.navLink} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+              <Link to="/templates" className={headerStyles.navLink} onClick={() => setMobileMenuOpen(false)}>Templates</Link>
+              <button onClick={() => { handleLogout(); setMobileMenuOpen(false) }} className={headerStyles.navLink}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/templates" className={headerStyles.navLink} onClick={() => setMobileMenuOpen(false)}>Templates</Link>
+              <Link to="/login" className={headerStyles.navLink} onClick={() => setMobileMenuOpen(false)}>Log in</Link>
+              <Link to="/builder" className={headerStyles.navCTA} onClick={() => setMobileMenuOpen(false)}>
+                Build Resume →
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
