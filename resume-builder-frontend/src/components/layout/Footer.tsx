@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FileText, Github, Twitter, Linkedin, Heart } from 'lucide-react'
+import { FileText, Github, Twitter, Linkedin } from 'lucide-react'
 
 const footerLinks = [
     {
@@ -112,8 +112,8 @@ export function Footer() {
                     <p className="text-xs" style={{ color: 'var(--muted)' }}>
                         © {new Date().getFullYear()} ResumeBuilder. All rights reserved.
                     </p>
-                    <p className="text-xs flex items-center gap-1" style={{ color: 'var(--muted)' }}>
-                        Made with <Heart className="w-3 h-3 fill-red-500 text-red-500" /> for job seekers everywhere
+                    <p className="text-xs" style={{ color: 'var(--muted)' }}>
+                        Empowering job seekers worldwide
                     </p>
                 </div>
             </div>
