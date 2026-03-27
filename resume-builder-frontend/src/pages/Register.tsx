@@ -25,10 +25,14 @@ const registerSchema = z.object({
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
         .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
         .regex(/[0-9]/, 'Password must contain at least one number'),
+    confirmPassword: z.string(),
     phone: z.string().optional(),
     terms: z.boolean().refine((val) => val === true, {
         message: 'You must accept the terms and conditions',
     }),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // path of error
 })
 
 type RegisterFormData = z.infer<typeof registerSchema>
@@ -69,10 +73,10 @@ export const Register = () => {
     }
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center px-6 py-12" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+        <div className="min-h-screen relative flex flex-col justify-center px-4 sm:px-6 py-12" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
             <FloatingShapes />
 
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-md mx-auto relative z-10">
                 {/* Header */}
                 <div className="mb-8 text-center">
                     <Link to="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
@@ -88,28 +92,30 @@ export const Register = () => {
                 </div>
 
                 {/* Register Form */}
-                <form onSubmit={handleSubmit(onSubmit)} className="backdrop-blur rounded-2xl p-8 border shadow-xl space-y-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                    {/* First Name */}
-                    <Input
-                        label="First name"
-                        type="text"
-                        placeholder="John"
-                        icon={<UserIcon className="h-5 w-5" />}
-                        {...register('firstName')}
-                        error={errors.firstName?.message}
-                        required
-                    />
+                <form onSubmit={handleSubmit(onSubmit)} className="backdrop-blur rounded-2xl p-6 sm:p-8 border shadow-xl space-y-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* First Name */}
+                        <Input
+                            label="First name"
+                            type="text"
+                            placeholder="John"
+                            icon={<UserIcon className="h-5 w-5" />}
+                            {...register('firstName')}
+                            error={errors.firstName?.message}
+                            required
+                        />
 
-                    {/* Last Name */}
-                    <Input
-                        label="Last name"
-                        type="text"
-                        placeholder="Doe"
-                        icon={<UserIcon className="h-5 w-5" />}
-                        {...register('lastName')}
-                        error={errors.lastName?.message}
-                        required
-                    />
+                        {/* Last Name */}
+                        <Input
+                            label="Last name"
+                            type="text"
+                            placeholder="Doe"
+                            icon={<UserIcon className="h-5 w-5" />}
+                            {...register('lastName')}
+                            error={errors.lastName?.message}
+                            required
+                        />
+                    </div>
 
                     {/* Email */}
                     <Input
@@ -128,9 +134,20 @@ export const Register = () => {
                         type="password"
                         placeholder="••••••••"
                         icon={<LockClosedIcon className="h-5 w-5" />}
-                        hint="At least 8 characters, 1 uppercase, 1 lowercase, 1 number"
+                        hint="At least 8 chars, 1 uppercase, 1 lowercase, 1 number"
                         {...register('password')}
                         error={errors.password?.message}
+                        required
+                    />
+
+                    {/* Confirm Password */}
+                    <Input
+                        label="Confirm password"
+                        type="password"
+                        placeholder="••••••••"
+                        icon={<LockClosedIcon className="h-5 w-5" />}
+                        {...register('confirmPassword')}
+                        error={errors.confirmPassword?.message}
                         required
                     />
 

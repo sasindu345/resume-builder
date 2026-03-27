@@ -56,10 +56,10 @@ export const Login = () => {
     }
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center px-6 py-12" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+        <div className="min-h-screen relative flex flex-col justify-center px-4 sm:px-6 py-12" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
             <FloatingShapes />
 
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-md mx-auto relative z-10">
                 {/* Header */}
                 <div className="mb-8 text-center">
                     <Link to="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
@@ -75,7 +75,7 @@ export const Login = () => {
                 </div>
 
                 {/* Login Form */}
-                <form onSubmit={handleSubmit(onSubmit)} className="backdrop-blur rounded-2xl p-8 border shadow-xl" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+                <form onSubmit={handleSubmit(onSubmit)} className="backdrop-blur rounded-2xl p-6 sm:p-8 border shadow-xl" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
                     {/* Email Field */}
                     <Input
                         label="Email address"
