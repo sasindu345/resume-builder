@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowDownTrayIcon, PlusIcon, TrashIcon, SparklesIcon, UserCircleIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon, PlusIcon, TrashIcon, SparklesIcon, UserCircleIcon, LockClosedIcon, EyeIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
@@ -21,9 +21,13 @@ export interface GuestResumeData {
     theme: ThemeName;
     personalInfo: {
         fullName: string;
+        jobTitle: string;
         email: string;
         phone: string;
         location: string;
+        linkedin: string;
+        github: string;
+        portfolio: string;
         summary: string;
         profileImage: string;
     };
@@ -52,6 +56,27 @@ export interface GuestResumeData {
         name: string;
         proficiency: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
     }>;
+    projects: Array<{
+        id: string;
+        name: string;
+        description: string;
+        technologies: string;
+        link: string;
+        startDate: string;
+        endDate: string;
+    }>;
+    certifications: Array<{
+        id: string;
+        name: string;
+        issuer: string;
+        date: string;
+        credentialUrl: string;
+    }>;
+    languages: Array<{
+        id: string;
+        language: string;
+        proficiency: 'Native' | 'Fluent' | 'Intermediate' | 'Basic';
+    }>;
 }
 
 const defaultResumeData: GuestResumeData = {
@@ -60,15 +85,22 @@ const defaultResumeData: GuestResumeData = {
     theme: 'blue',
     personalInfo: {
         fullName: '',
+        jobTitle: '',
         email: '',
         phone: '',
         location: '',
+        linkedin: '',
+        github: '',
+        portfolio: '',
         summary: '',
         profileImage: '',
     },
     education: [],
     experience: [],
     skills: [],
+    projects: [],
+    certifications: [],
+    languages: [],
 };
 
 /**
@@ -83,7 +115,19 @@ export function GuestResumeBuilder() {
     const [resumeData, setResumeData] = useState<GuestResumeData>(() => {
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
-            return saved ? JSON.parse(saved) : defaultResumeData;
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Merge with defaults so old localStorage data missing new fields doesn't crash
+                return {
+                    ...defaultResumeData,
+                    ...parsed,
+                    personalInfo: { ...defaultResumeData.personalInfo, ...parsed.personalInfo },
+                    projects: parsed.projects || [],
+                    certifications: parsed.certifications || [],
+                    languages: parsed.languages || [],
+                };
+            }
+            return defaultResumeData;
         } catch {
             return defaultResumeData;
         }
@@ -97,15 +141,19 @@ export function GuestResumeBuilder() {
     const [newSkillLevel, setNewSkillLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'>('Intermediate');
     const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
+    const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
     const previewRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const steps = [
         { title: 'Title & Design', description: 'Choose a title, template, and color' },
-        { title: 'Personal Info', description: 'Basic information and summary' },
-        { title: 'Experience', description: 'Work history and details' },
+        { title: 'Personal Info', description: 'Basic information, links, and summary' },
+        { title: 'Experience', description: 'Work history and achievements' },
         { title: 'Education', description: 'Academic background' },
         { title: 'Skills', description: 'Professional skills and proficiency' },
+        { title: 'Projects', description: 'Personal or professional projects' },
+        { title: 'Additional', description: 'Certifications and languages' },
     ];
 
     // Auto-save to localStorage
@@ -189,6 +237,72 @@ export function GuestResumeBuilder() {
         setResumeData(prev => ({ ...prev, skills: prev.skills.filter(s => s.id !== id) }));
     };
 
+    // ── Projects CRUD ──
+    const addProject = useCallback(() => {
+        setResumeData(prev => ({
+            ...prev,
+            projects: [...prev.projects, {
+                id: Date.now().toString(),
+                name: '', description: '', technologies: '', link: '', startDate: '', endDate: '',
+            }],
+        }));
+    }, []);
+
+    const updateProject = (id: string, field: string, value: string) => {
+        setResumeData(prev => ({
+            ...prev,
+            projects: prev.projects.map(p => p.id === id ? { ...p, [field]: value } : p),
+        }));
+    };
+
+    const removeProject = (id: string) => {
+        setResumeData(prev => ({ ...prev, projects: prev.projects.filter(p => p.id !== id) }));
+    };
+
+    // ── Certifications CRUD ──
+    const addCertification = useCallback(() => {
+        setResumeData(prev => ({
+            ...prev,
+            certifications: [...prev.certifications, {
+                id: Date.now().toString(),
+                name: '', issuer: '', date: '', credentialUrl: '',
+            }],
+        }));
+    }, []);
+
+    const updateCertification = (id: string, field: string, value: string) => {
+        setResumeData(prev => ({
+            ...prev,
+            certifications: prev.certifications.map(c => c.id === id ? { ...c, [field]: value } : c),
+        }));
+    };
+
+    const removeCertification = (id: string) => {
+        setResumeData(prev => ({ ...prev, certifications: prev.certifications.filter(c => c.id !== id) }));
+    };
+
+    // ── Languages CRUD ──
+    const addLanguage = useCallback(() => {
+        setResumeData(prev => ({
+            ...prev,
+            languages: [...prev.languages, {
+                id: Date.now().toString(),
+                language: '', proficiency: 'Intermediate' as const,
+            }],
+        }));
+    }, []);
+
+    const updateLanguage = (id: string, field: string, value: string) => {
+        setResumeData(prev => ({
+            ...prev,
+            languages: prev.languages.map(l => l.id === id ? { ...l, [field]: value } : l),
+        }));
+    };
+
+    const removeLanguage = (id: string) => {
+        setResumeData(prev => ({ ...prev, languages: prev.languages.filter(l => l.id !== id) }));
+    };
+
     // Profile image upload (unsigned Cloudinary)
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -268,37 +382,46 @@ export function GuestResumeBuilder() {
         <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
             {/* Top Bar */}
             <div className="sticky top-0 z-40 border-b shadow-sm" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
-                <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         <button
                             onClick={() => navigate('/')}
                             className="text-sm font-medium hover:opacity-70"
                             style={{ color: 'var(--muted)' }}
                         >
-                            ← Home
+                            ← <span className="hidden sm:inline">Home</span>
                         </button>
-                        <span className="px-2 py-0.5 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 text-xs font-semibold rounded-full">
+                        <span className="px-2 py-0.5 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 text-xs font-semibold rounded-full hidden sm:inline">
                             Guest Mode
                         </span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+                        {/* Mobile Preview Toggle */}
+                        <button
+                            onClick={() => setShowPreview(!showPreview)}
+                            className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+                            style={{ background: showPreview ? 'var(--primary-600)' : 'var(--bg)', color: showPreview ? '#fff' : 'var(--text)', border: '1px solid var(--border)' }}
+                        >
+                            {showPreview ? <PencilSquareIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                            <span className="hidden sm:inline">{showPreview ? 'Edit' : 'Preview'}</span>
+                        </button>
                         {!isAuthenticated && (
                             <button
                                 onClick={() => handlePremiumAction('AI CV Review')}
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
                             >
                                 <SparklesIcon className="h-4 w-4" />
-                                AI Review
+                                <span className="hidden sm:inline">AI Review</span>
                             </button>
                         )}
                         <Button onClick={exportToPDF} disabled={isExporting} variant="primary" className="flex items-center gap-2">
                             <ArrowDownTrayIcon className="h-4 w-4" />
-                            {isExporting ? 'Exporting...' : 'Download PDF'}
+                            <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Download PDF'}</span>
                         </Button>
                         {!isAuthenticated && (
                             <button
                                 onClick={() => navigate('/register')}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:opacity-90 transition-opacity"
+                                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:opacity-90 transition-opacity"
                             >
                                 <LockClosedIcon className="h-4 w-4" />
                                 Save & Unlock
@@ -334,7 +457,8 @@ export function GuestResumeBuilder() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_820px] gap-6 items-start">
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="space-y-4">
+                    {/* Editor - hide on mobile when preview is shown */}
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className={`space-y-4 ${showPreview ? 'hidden lg:block' : ''}`}>
                         {/* Step 0 — Title & Design */}
                         {currentStep === 0 && (
                             <>
@@ -427,9 +551,17 @@ export function GuestResumeBuilder() {
                                     </div>
 
                                     <Input label="Full Name" value={resumeData.personalInfo.fullName} onChange={(e) => updatePersonalInfo('fullName', e.target.value)} placeholder="John Doe" />
-                                    <Input label="Email" type="email" value={resumeData.personalInfo.email} onChange={(e) => updatePersonalInfo('email', e.target.value)} placeholder="john@example.com" />
-                                    <Input label="Phone" value={resumeData.personalInfo.phone} onChange={(e) => updatePersonalInfo('phone', e.target.value)} placeholder="+1 (555) 000-0000" />
+                                    <Input label="Professional Title" value={resumeData.personalInfo.jobTitle} onChange={(e) => updatePersonalInfo('jobTitle', e.target.value)} placeholder="e.g. Software Engineer, Product Designer" />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <Input label="Email" type="email" value={resumeData.personalInfo.email} onChange={(e) => updatePersonalInfo('email', e.target.value)} placeholder="john@example.com" />
+                                        <Input label="Phone" value={resumeData.personalInfo.phone} onChange={(e) => updatePersonalInfo('phone', e.target.value)} placeholder="+1 (555) 000-0000" />
+                                    </div>
                                     <Input label="Location" value={resumeData.personalInfo.location} onChange={(e) => updatePersonalInfo('location', e.target.value)} placeholder="New York, NY" />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <Input label="LinkedIn (optional)" value={resumeData.personalInfo.linkedin} onChange={(e) => updatePersonalInfo('linkedin', e.target.value)} placeholder="linkedin.com/in/johndoe" />
+                                        <Input label="GitHub (optional)" value={resumeData.personalInfo.github} onChange={(e) => updatePersonalInfo('github', e.target.value)} placeholder="github.com/johndoe" />
+                                    </div>
+                                    <Input label="Portfolio / Website (optional)" value={resumeData.personalInfo.portfolio} onChange={(e) => updatePersonalInfo('portfolio', e.target.value)} placeholder="johndoe.com" />
                                     <div>
                                         <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Professional Summary</label>
                                         <textarea
@@ -618,6 +750,134 @@ export function GuestResumeBuilder() {
                             </div>
                         )}
 
+                        {/* Step 5 — Projects */}
+                        {currentStep === 5 && (
+                            <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Projects</h2>
+                                    <button onClick={addProject} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                                        <PlusIcon className="h-5 w-5" /> Add
+                                    </button>
+                                </div>
+                                <p className="text-xs mb-3" style={{ color: 'var(--muted)' }}>Add personal, academic, or professional projects to showcase your practical skills.</p>
+                                <div style={{ maxHeight: '65vh', overflowY: 'auto' }} className="space-y-2 pr-1">
+                                    {resumeData.projects.map((proj) => {
+                                        const expanded = expandedProjectId === proj.id;
+                                        return (
+                                            <div key={proj.id} className="border rounded-lg" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+                                                <button type="button" className="w-full flex items-center justify-between px-4 py-2 text-left hover:bg-blue-50 transition-colors rounded-t-lg"
+                                                    style={{ color: 'var(--text)', fontWeight: 500 }}
+                                                    onClick={() => setExpandedProjectId(expanded ? null : proj.id)}>
+                                                    <span>{proj.name || <span className="italic text-slate-400">(Untitled project)</span>}</span>
+                                                    <span className="ml-2 text-xs text-blue-600">{expanded ? 'Collapse' : 'Expand'}</span>
+                                                </button>
+                                                {expanded && (
+                                                    <div className="p-4 space-y-3">
+                                                        <Input label="Project Name" value={proj.name} onChange={(e) => updateProject(proj.id, 'name', e.target.value)} placeholder="My Awesome App" />
+                                                        <div>
+                                                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Description</label>
+                                                            <textarea value={proj.description} onChange={(e) => updateProject(proj.id, 'description', e.target.value)} placeholder="What the project does, your role, impact..." rows={3} className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none" style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }} />
+                                                        </div>
+                                                        <Input label="Technologies" value={proj.technologies} onChange={(e) => updateProject(proj.id, 'technologies', e.target.value)} placeholder="React, Node.js, PostgreSQL" />
+                                                        <Input label="Link (optional)" value={proj.link} onChange={(e) => updateProject(proj.id, 'link', e.target.value)} placeholder="github.com/user/project" />
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <div>
+                                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Start Date</label>
+                                                                <input type="month" value={proj.startDate} onChange={(e) => updateProject(proj.id, 'startDate', e.target.value)} className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none text-sm" style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }} />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>End Date</label>
+                                                                <input type="month" value={proj.endDate} onChange={(e) => updateProject(proj.id, 'endDate', e.target.value)} className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none text-sm" style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }} />
+                                                            </div>
+                                                        </div>
+                                                        <button onClick={() => removeProject(proj.id)} className="flex items-center gap-2 text-red-600 hover:text-red-700 text-sm">
+                                                            <TrashIcon className="h-4 w-4" /> Remove
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                    {resumeData.projects.length === 0 && (
+                                        <p className="text-sm text-slate-400 italic">No projects added yet. Click "Add" to get started.</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 6 — Additional (Certifications + Languages) */}
+                        {currentStep === 6 && (
+                            <div className="space-y-4">
+                                {/* Certifications */}
+                                <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Certifications</h2>
+                                        <button onClick={addCertification} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                                            <PlusIcon className="h-5 w-5" /> Add
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {resumeData.certifications.map((cert) => (
+                                            <div key={cert.id} className="p-3 border rounded-lg" style={{ borderColor: 'var(--border)' }}>
+                                                <div className="grid grid-cols-2 gap-3 mb-3">
+                                                    <Input label="Certificate Name" value={cert.name} onChange={(e) => updateCertification(cert.id, 'name', e.target.value)} placeholder="AWS Solutions Architect" />
+                                                    <Input label="Issuing Organization" value={cert.issuer} onChange={(e) => updateCertification(cert.id, 'issuer', e.target.value)} placeholder="Amazon Web Services" />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3 mb-2">
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Date Obtained</label>
+                                                        <input type="month" value={cert.date} onChange={(e) => updateCertification(cert.id, 'date', e.target.value)} className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none text-sm" style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }} />
+                                                    </div>
+                                                    <Input label="Credential URL (optional)" value={cert.credentialUrl} onChange={(e) => updateCertification(cert.id, 'credentialUrl', e.target.value)} placeholder="credential.net/abc123" />
+                                                </div>
+                                                <button onClick={() => removeCertification(cert.id)} className="flex items-center gap-2 text-red-600 hover:text-red-700 text-sm">
+                                                    <TrashIcon className="h-4 w-4" /> Remove
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {resumeData.certifications.length === 0 && (
+                                            <p className="text-sm text-slate-400 italic">No certifications added yet.</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Languages */}
+                                <div className="rounded-lg shadow p-4" style={{ background: 'var(--surface)' }}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Languages</h2>
+                                        <button onClick={addLanguage} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                                            <PlusIcon className="h-5 w-5" /> Add
+                                        </button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {resumeData.languages.map((lang) => (
+                                            <div key={lang.id} className="flex items-center gap-3 p-2 border rounded-lg" style={{ borderColor: 'var(--border)' }}>
+                                                <input type="text" value={lang.language} onChange={(e) => updateLanguage(lang.id, 'language', e.target.value)}
+                                                    placeholder="e.g. English, Spanish, Mandarin"
+                                                    className="flex-1 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+                                                />
+                                                <select value={lang.proficiency} onChange={(e) => updateLanguage(lang.id, 'proficiency', e.target.value)}
+                                                    className="px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                                                    style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}>
+                                                    <option value="Native">Native</option>
+                                                    <option value="Fluent">Fluent</option>
+                                                    <option value="Intermediate">Intermediate</option>
+                                                    <option value="Basic">Basic</option>
+                                                </select>
+                                                <button onClick={() => removeLanguage(lang.id)} className="text-red-600 hover:text-red-700">
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {resumeData.languages.length === 0 && (
+                                            <p className="text-sm text-slate-400 italic">No languages added yet.</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Navigation */}
                         <div style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} className="rounded-lg shadow p-3 sm:p-4 border">
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
@@ -656,10 +916,10 @@ export function GuestResumeBuilder() {
                         </div>
                     </motion.div>
 
-                    {/* Preview */}
-                    <motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.1 }} className="px-2" aria-label="Resume preview">
+                    {/* Preview - hidden on mobile unless toggled */}
+                    <motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.1 }} className={`px-2 ${showPreview ? '' : 'hidden lg:block'}`} aria-label="Resume preview">
                         <div ref={previewRef} className={`a4-sheet mx-auto ${previewStyles.sheet}`}
-                            style={{ width: '210mm', minHeight: '297mm', background: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                            style={{ width: '210mm', maxWidth: '100%', minHeight: '297mm', background: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                             <ResumePreview data={resumeData} />
                         </div>
                     </motion.aside>
