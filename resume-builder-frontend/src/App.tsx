@@ -1,5 +1,5 @@
 import './App.css'
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -14,6 +14,7 @@ import { VerifyEmail } from '@/pages/VerifyEmail'
 import { TemplatesGallery } from '@/pages/TemplatesGallery'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { FloatingShapes } from '@/components/animations/FloatingShapes'
+import { Footer } from '@/components/layout/Footer'
 import headerStyles from '@/styles/components/Header.module.css'
 
 // Sun icon
@@ -59,6 +60,12 @@ function LogoIcon() {
 function AppRoutes() {
   const { isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Hide footer on builder/editor pages
+  const hideFooter = location.pathname.startsWith('/builder') || location.pathname.startsWith('/resume/')
+  // Transparent header on home page
+  const isHomePage = location.pathname === '/'
 
   const [theme, setTheme] = useState<string>(() => {
     try {
@@ -92,7 +99,7 @@ function AppRoutes() {
     <div className="min-h-screen relative overflow-hidden">
       <FloatingShapes />
 
-      <header className={headerStyles.header}>
+      <header className={isHomePage ? headerStyles.headerTransparent : headerStyles.header}>
         <div className={headerStyles.headerContent}>
           {/* Logo */}
           <Link to="/" className={headerStyles.logo}>
@@ -158,6 +165,8 @@ function AppRoutes() {
           }
         />
       </Routes>
+
+      {!hideFooter && <Footer />}
     </div>
   )
 }
