@@ -132,7 +132,7 @@ const features = [
 function TestimonialCard({ quote, name, role, initials, color }: typeof testimonials[0]) {
     return (
         <div
-            className="testimonial-card flex-shrink-0 w-[340px] rounded-2xl p-6 border flex flex-col gap-4"
+            className="testimonial-card flex-shrink-0 w-[280px] sm:w-[340px] rounded-2xl p-5 sm:p-6 border flex flex-col gap-3 sm:gap-4"
             style={{
                 background: 'var(--surface)',
                 borderColor: 'var(--border)',
