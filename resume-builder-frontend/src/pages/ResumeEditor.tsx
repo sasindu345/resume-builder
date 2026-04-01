@@ -396,7 +396,7 @@ export function ResumeEditor() {
             const fileName = resumeData.personalInfo.fullName || resumeData.title || 'resume';
             await exportResumePDF(previewRef, fileName);
 
-            toast.success('PDF ready! Use "Save as PDF" in the print dialog.', { id: 'pdf-export' });
+            toast.success('Print dialog opened. Save or share it as a PDF.', { id: 'pdf-export' });
         } catch (error) {
             console.error('[PDF Export] Failed:', error);
             const msg = error instanceof Error ? error.message : 'Unknown error';

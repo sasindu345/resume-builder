@@ -1,14 +1,10 @@
 import type { RefObject } from 'react';
 
-/**
- * PDF export via the browser's native print dialog.
- *
- * This keeps the real preview DOM in place so the browser prints the exact
- * same Tailwind/CSS-module-styled layout the user already sees on screen.
- */
-
-const PRINT_ATTR = 'data-pdf-print-target';
+const PRINT_ROOT_ATTR = 'data-pdf-print-root';
+const PRINT_TARGET_ATTR = 'data-pdf-print-target';
 const PRINT_STYLE_ID = 'pdf-export-print-styles';
+const A4_WIDTH_MM = '210mm';
+const A4_HEIGHT_MM = '297mm';
 
 const PRINT_CSS = `
 @page {
@@ -21,27 +17,41 @@ const PRINT_CSS = `
     body {
         margin: 0 !important;
         padding: 0 !important;
-        width: 210mm !important;
-        min-height: 297mm !important;
-        overflow: visible !important;
         background: #ffffff !important;
+        overflow: visible !important;
     }
 
     body * {
         visibility: hidden !important;
     }
 
-    [${PRINT_ATTR}],
-    [${PRINT_ATTR}] * {
+    [${PRINT_ROOT_ATTR}],
+    [${PRINT_ROOT_ATTR}] * {
         visibility: visible !important;
     }
 
-    [${PRINT_ATTR}] {
-        position: fixed !important;
-        inset: 0 auto auto 0 !important;
-        width: 210mm !important;
-        min-height: 297mm !important;
+    [${PRINT_ROOT_ATTR}] {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: ${A4_WIDTH_MM} !important;
+        min-height: ${A4_HEIGHT_MM} !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        pointer-events: none !important;
+        background: #ffffff !important;
+        z-index: 2147483647 !important;
+    }
+
+    [${PRINT_TARGET_ATTR}] {
+        position: static !important;
+        width: ${A4_WIDTH_MM} !important;
+        min-height: ${A4_HEIGHT_MM} !important;
         max-width: none !important;
+        box-sizing: border-box !important;
         margin: 0 !important;
         transform: none !important;
         box-shadow: none !important;
@@ -49,7 +59,6 @@ const PRINT_CSS = `
         border-radius: 0 !important;
         overflow: visible !important;
         background: #ffffff !important;
-        z-index: 2147483647 !important;
     }
 
     *,
@@ -71,26 +80,54 @@ function sanitizeFileName(fileName: string): string {
         .trim() || 'resume';
 }
 
-function collectHiddenAncestors(element: HTMLElement): HTMLElement[] {
-    const hiddenAncestors: HTMLElement[] = [];
-    let current = element.parentElement;
-
-    while (current && current !== document.body) {
-        if (current.classList.contains('hidden')) {
-            current.classList.remove('hidden');
-            hiddenAncestors.push(current);
-        }
-
-        current = current.parentElement;
-    }
-
-    return hiddenAncestors;
+function removeExistingPrintArtifacts(): void {
+    document.getElementById(PRINT_STYLE_ID)?.remove();
+    document.querySelectorAll(`[${PRINT_ROOT_ATTR}]`).forEach((node) => node.remove());
 }
 
-async function waitForPrintLayout(): Promise<void> {
+function createPrintRoot(clonedPreview: HTMLElement): HTMLDivElement {
+    const root = document.createElement('div');
+    root.setAttribute(PRINT_ROOT_ATTR, 'true');
+    root.style.position = 'fixed';
+    root.style.inset = '0';
+    root.style.opacity = '0';
+    root.style.pointerEvents = 'none';
+    root.style.overflow = 'hidden';
+    root.style.zIndex = '-1';
+
+    clonedPreview.setAttribute(PRINT_TARGET_ATTR, 'true');
+    clonedPreview.style.width = '794px';
+    clonedPreview.style.minHeight = '1123px';
+    clonedPreview.style.maxWidth = 'none';
+    clonedPreview.style.transform = 'none';
+    clonedPreview.style.margin = '0';
+    clonedPreview.style.boxShadow = 'none';
+    clonedPreview.style.border = 'none';
+    clonedPreview.style.borderRadius = '0';
+    clonedPreview.style.overflow = 'visible';
+    clonedPreview.style.background = '#ffffff';
+
+    root.appendChild(clonedPreview);
+    return root;
+}
+
+async function waitForPrintLayout(container: HTMLElement): Promise<void> {
     if (document.fonts) {
         await document.fonts.ready;
     }
+
+    const images = Array.from(container.querySelectorAll('img'));
+    await Promise.all(images.map((image) => new Promise<void>((resolve) => {
+        if (image.complete) {
+            resolve();
+            return;
+        }
+
+        const done = () => resolve();
+        image.addEventListener('load', done, { once: true });
+        image.addEventListener('error', done, { once: true });
+        window.setTimeout(done, 5000);
+    })));
 
     await new Promise<void>((resolve) => {
         requestAnimationFrame(() => {
@@ -108,25 +145,26 @@ export async function exportResumePDF(
         throw new Error('Preview element not found');
     }
 
-    const existingStyle = document.getElementById(PRINT_STYLE_ID);
-    existingStyle?.remove();
+    removeExistingPrintArtifacts();
 
-    const hiddenAncestors = collectHiddenAncestors(previewEl);
     const previousTitle = document.title;
     const safeTitle = sanitizeFileName(fileName);
-
-    previewEl.setAttribute(PRINT_ATTR, 'true');
-    document.title = safeTitle;
-
     const styleEl = document.createElement('style');
+    const clonedPreview = previewEl.cloneNode(true) as HTMLElement;
+    const printRoot = createPrintRoot(clonedPreview);
+
     styleEl.id = PRINT_STYLE_ID;
     styleEl.textContent = PRINT_CSS;
+
+    document.title = safeTitle;
     document.head.appendChild(styleEl);
+    document.body.appendChild(printRoot);
 
     let cleanedUp = false;
     const mediaQueryList = typeof window.matchMedia === 'function'
         ? window.matchMedia('print')
         : null;
+    let fallbackCleanupId: number | undefined;
 
     const cleanup = () => {
         if (cleanedUp) {
@@ -134,10 +172,13 @@ export async function exportResumePDF(
         }
 
         cleanedUp = true;
-        previewEl.removeAttribute(PRINT_ATTR);
-        styleEl.remove();
         document.title = previousTitle;
-        hiddenAncestors.forEach((ancestor) => ancestor.classList.add('hidden'));
+        printRoot.remove();
+        styleEl.remove();
+
+        if (fallbackCleanupId) {
+            window.clearTimeout(fallbackCleanupId);
+        }
 
         window.removeEventListener('afterprint', handleAfterPrint);
 
@@ -174,7 +215,11 @@ export async function exportResumePDF(
         }
     }
 
-    await waitForPrintLayout();
+    fallbackCleanupId = window.setTimeout(() => {
+        cleanup();
+    }, 60_000);
+
+    await waitForPrintLayout(printRoot);
 
     try {
         window.print();
