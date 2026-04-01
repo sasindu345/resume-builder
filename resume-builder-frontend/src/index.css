@@ -70,6 +70,23 @@ body {
   100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
 }
 
+/* Lightweight floating shape animations (CSS only, no JS) */
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -30px); }
+}
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, 40px); }
+}
+@keyframes float-3 {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+}
+.animate-float-1 { animation: float-1 8s ease-in-out infinite; }
+.animate-float-2 { animation: float-2 10s ease-in-out infinite 1s; }
+.animate-float-3 { animation: float-3 6s ease-in-out infinite; }
+
 .animate-fade-in-up {
   animation: fadeInUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -236,14 +253,23 @@ body {
     box-shadow: none;
     border: none;
     break-inside: avoid;
+    width: 210mm;
+    min-height: 297mm;
+    max-width: none;
+    border-radius: 0;
+    background: #ffffff;
   }
 }
 
 @media (max-width: 768px) {
   .a4-sheet {
-    width: 100%;
-    min-height: auto;
-    padding: 16px;
+    width: 794px;
+    min-height: 1123px;
+    padding: 0;
+    max-width: none;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
   }
 }
 

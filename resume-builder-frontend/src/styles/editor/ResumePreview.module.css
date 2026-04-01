@@ -1,10 +1,9 @@
 .sheet {
     width: 794px;
     /* A4 width at 96dpi */
-    height: 1123px;
+    min-height: 1123px;
     /* A4 height at 96dpi */
     max-width: 100%;
-    max-height: 100%;
     background: var(--surface);
     color: var(--text);
     box-shadow: var(--shadow);
@@ -25,33 +24,27 @@
 @media (max-width: 1280px) {
     .sheet {
         width: 700px;
-        height: 990px;
+        min-height: 990px;
     }
 }
 
 @media (max-width: 1024px) {
     .sheet {
         width: 600px;
-        height: 849px;
+        min-height: 849px;
     }
 }
 
+/* Mobile: Full-width PDF viewer experience */
 @media (max-width: 768px) {
     .sheet {
-        width: 100vw;
-        height: auto;
-        min-height: 0;
-        margin: 0 auto;
-        padding: 16px;
-    }
-}
-
-/* Small mobile: Minimal padding */
-@media (max-width: 480px) {
-    .sheet {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
+        width: 794px;
+        min-height: 1123px;
+        max-width: none;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
     }
 }
 
@@ -59,8 +52,42 @@
     .sheet {
         box-shadow: none;
         border: none;
-        width: 100%;
-        min-height: auto;
+        width: 210mm;
+        min-height: 297mm;
+        max-width: none;
+        border-radius: 0;
+        background: #ffffff;
+    }
+
+    .mobilePreviewWrapper {
+        overflow: visible;
+        max-height: none;
+    }
+
+    .mobilePreviewWrapper .sheet {
+        transform: none;
+        margin-bottom: 0;
+    }
+}
+
+/* Mobile preview wrapper — scales sheet to fit viewport */
+.mobilePreviewWrapper {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .mobilePreviewWrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: calc(100vh - 140px);
+    }
+
+    .mobilePreviewWrapper .sheet {
+        transform-origin: top left;
+        transform: scale(var(--preview-scale, 0.5));
+        margin-bottom: calc(-1123px * (1 - var(--preview-scale, 0.5)));
     }
 }
 
