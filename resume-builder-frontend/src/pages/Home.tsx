@@ -224,31 +224,112 @@ export function Home() {
         <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
 
             {/* ──────────────────────────────────────
-                HERO SECTION
+                HERO — MOBILE (app-like fullscreen)
             ────────────────────────────────────── */}
-            <section className="relative overflow-hidden">
+            <section className="sm:hidden relative overflow-hidden" style={{ minHeight: '100svh' }}>
+                {/* Gradient background instead of heavy image */}
+                <div className="absolute inset-0 z-0" style={{
+                    background: 'linear-gradient(160deg, #0f172a 0%, #1e293b 40%, #1e1b4b 70%, #0f172a 100%)',
+                }} />
+                {/* Decorative circles */}
+                <div className="absolute top-[-20%] right-[-30%] w-[70vw] h-[70vw] rounded-full opacity-20"
+                    style={{ background: 'radial-gradient(circle, #3b82f6, transparent 70%)' }} />
+                <div className="absolute bottom-[10%] left-[-20%] w-[50vw] h-[50vw] rounded-full opacity-15"
+                    style={{ background: 'radial-gradient(circle, #7c3aed, transparent 70%)' }} />
+
+                <div className="relative z-10 flex flex-col justify-between px-6 pt-20 pb-8" style={{ minHeight: '100svh' }}>
+                    {/* Top content */}
+                    <div className="flex-1 flex flex-col justify-center space-y-6">
+                        {/* Small badge */}
+                        <div className="animate-fade-in-up">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold tracking-wide uppercase"
+                                style={{ background: 'rgba(99,102,241,0.2)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.3)' }}>
+                                <Sparkles className="w-3 h-3" />
+                                Free &middot; AI-Powered
+                            </span>
+                        </div>
+
+                        {/* Heading */}
+                        <div className="animate-fade-in-up-delay-1 space-y-3">
+                            <h1 className="text-[2.5rem] font-extrabold leading-[1.08] tracking-tight text-white">
+                                Build Resumes<br />
+                                That <span style={{
+                                    background: 'linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundClip: 'text',
+                                }}>Get You Hired</span>
+                            </h1>
+                            <p className="text-[15px] leading-relaxed text-slate-400 max-w-[300px]">
+                                Create professional, ATS-friendly resumes in minutes with AI-powered feedback.
+                            </p>
+                        </div>
+
+                        {/* CTA */}
+                        <div className="animate-fade-in-up-delay-2 space-y-3 pt-2">
+                            <Link
+                                to="/builder"
+                                className="group flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-bold text-[15px] text-white shadow-xl active:scale-[0.98] transition-transform"
+                                style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)', boxShadow: '0 8px 32px rgba(37,99,235,0.35)' }}
+                            >
+                                Create Resume Now
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+                            <Link
+                                to="/templates"
+                                className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-semibold text-[15px] text-white/90 active:scale-[0.98] transition-transform"
+                                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
+                            >
+                                <Palette className="w-4 h-4" />
+                                View Templates
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Bottom feature pills */}
+                    <div className="animate-fade-in-up-delay-3 pt-6">
+                        <div className="grid grid-cols-2 gap-2.5">
+                            {[
+                                { icon: Shield, label: 'No sign-up needed' },
+                                { icon: Palette, label: '5 templates · 6 themes' },
+                                { icon: Brain, label: 'AI CV Reviewer' },
+                                { icon: Download, label: 'PDF export' },
+                            ].map(({ icon: Icon, label }) => (
+                                <div key={label} className="flex items-center gap-2 px-3 py-2.5 rounded-xl"
+                                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                    <Icon className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                                    <span className="text-[11px] font-medium text-slate-300">{label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ──────────────────────────────────────
+                HERO — DESKTOP / TABLET
+            ────────────────────────────────────── */}
+            <section className="hidden sm:block relative overflow-hidden">
                 {/* Background Image + Overlays */}
                 <div className="absolute inset-0 z-0">
                     <img
                         src="/CVs-Resumes-How-to-Secure-a-Law-Interview.jpg.webp"
                         alt=""
                         className="w-full h-full object-cover"
-                        style={{ filter: 'blur(6px) brightness(0.25)' }}
+                        style={{ filter: 'blur(4px) brightness(0.2)' }}
                     />
-                    {/* Subtle color tint — low opacity for dark theme compatibility */}
                     <div className="absolute inset-0" style={{
-                        background: 'linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(79,70,229,0.12) 50%, rgba(124,58,237,0.10) 100%)',
+                        background: 'linear-gradient(135deg, rgba(37,99,235,0.18) 0%, rgba(79,70,229,0.14) 50%, rgba(124,58,237,0.12) 100%)',
                     }} />
-                    {/* Bottom fade to page bg — smooth theme transition */}
                     <div className="absolute bottom-0 left-0 right-0 h-48" style={{
                         background: 'linear-gradient(to top, var(--bg), transparent)',
                     }} />
                 </div>
 
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-36 pb-24">
+                <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-36 pb-24">
                     <div className="text-center space-y-8">
                         {/* Badge */}
-                        <div className="animate-fade-in-up inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium max-w-full"
+                        <div className="animate-fade-in-up inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium"
                             style={{
                                 background: 'rgba(255,255,255,0.12)',
                                 backdropFilter: 'blur(16px)',
@@ -258,12 +339,12 @@ export function Home() {
                             }}
                         >
                             <Sparkles className="w-4 h-4 shrink-0" />
-                            <span className="text-left leading-tight">Free Professional Resume Builder — Powered by AI</span>
+                            Free Professional Resume Builder — Powered by AI
                         </div>
 
                         {/* Heading */}
                         <div className="animate-fade-in-up-delay-1 space-y-4">
-                            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white" style={{ letterSpacing: '-0.03em', lineHeight: 1.1, textShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+                            <h1 className="text-6xl lg:text-7xl font-extrabold tracking-tight text-white" style={{ letterSpacing: '-0.03em', lineHeight: 1.1, textShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
                                 Build Resumes That
                                 <span className="block" style={{
                                     background: 'linear-gradient(135deg, #93c5fd, #a78bfa, #f9a8d4)',
@@ -272,13 +353,13 @@ export function Home() {
                                     backgroundClip: 'text',
                                 }}>Get You Hired</span>
                             </h1>
-                            <p className="text-xl sm:text-2xl max-w-3xl mx-auto leading-relaxed text-white/80">
+                            <p className="text-2xl max-w-3xl mx-auto leading-relaxed text-white/80">
                                 Create ATS-friendly, visually stunning resumes in minutes. AI-powered feedback included.
                             </p>
                         </div>
 
                         {/* CTA Buttons */}
-                        <div className="animate-fade-in-up-delay-2 flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                        <div className="animate-fade-in-up-delay-2 flex flex-row gap-4 justify-center items-center pt-4">
                             <Link
                                 to="/builder"
                                 className="group px-8 py-4 rounded-2xl font-semibold text-lg flex items-center gap-2 text-white shadow-2xl transition-all hover:scale-105 hover:shadow-blue-500/30"

@@ -8,8 +8,7 @@ import { ResumePreview } from '@/components/resume-editor/ResumePreview';
 import { motion } from 'framer-motion';
 import { TemplateName, ThemeName, TEMPLATES, THEMES } from '@/types/template';
 import previewStyles from '../styles/editor/ResumePreview.module.css';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { exportResumePDF } from '@/utils/exportPdf';
 import { useAuth } from '@/hooks/useAuth';
 import { uploadImageUnsigned } from '@/services/cloudinaryService';
 
@@ -330,26 +329,18 @@ export function GuestResumeBuilder() {
     };
 
     const exportToPDF = async () => {
-        if (!previewRef.current) return;
         try {
             setIsExporting(true);
-            toast.loading('Generating PDF...', { id: 'pdf-export' });
+            toast.loading('Preparing PDF...', { id: 'pdf-export' });
 
-            const canvas = await html2canvas(previewRef.current, {
-                scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff',
-            });
+            const fileName = resumeData.personalInfo.fullName || resumeData.title || 'resume';
+            await exportResumePDF(previewRef, fileName);
 
-            const imgWidth = 210;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-            const imgData = canvas.toDataURL('image/png');
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
-            const fileName = `${resumeData.personalInfo.fullName || resumeData.title || 'resume'}.pdf`;
-            pdf.save(fileName);
-            toast.success('PDF downloaded!', { id: 'pdf-export' });
-        } catch {
-            toast.error('Failed to export PDF', { id: 'pdf-export' });
+            toast.success('PDF ready! Use "Save as PDF" in the print dialog.', { id: 'pdf-export' });
+        } catch (error) {
+            console.error('[PDF Export] Failed:', error);
+            const msg = error instanceof Error ? error.message : 'Unknown error';
+            toast.error(`PDF export failed: ${msg}`, { id: 'pdf-export' });
         } finally {
             setIsExporting(false);
         }
@@ -386,10 +377,14 @@ export function GuestResumeBuilder() {
                     <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         <button
                             onClick={() => navigate('/')}
-                            className="text-sm font-medium hover:opacity-70"
-                            style={{ color: 'var(--muted)' }}
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+                            style={{ color: 'var(--text)' }}
+                            aria-label="Back to home"
                         >
-                            ← <span className="hidden sm:inline">Home</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="15 18 9 12 15 6" />
+                            </svg>
+                            <span className="hidden sm:inline">Home</span>
                         </button>
                         <span className="px-2 py-0.5 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 text-xs font-semibold rounded-full hidden sm:inline">
                             Guest Mode
@@ -917,10 +912,16 @@ export function GuestResumeBuilder() {
                     </motion.div>
 
                     {/* Preview - hidden on mobile unless toggled */}
-                    <motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.1 }} className={`px-2 ${showPreview ? '' : 'hidden lg:block'}`} aria-label="Resume preview">
-                        <div ref={previewRef} className={`a4-sheet mx-auto ${previewStyles.sheet}`}
-                            style={{ width: '210mm', maxWidth: '100%', minHeight: '297mm', background: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                            <ResumePreview data={resumeData} />
+                    <motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.1 }}
+                        className={`${showPreview ? '' : 'hidden lg:block'}`}
+                        aria-label="Resume preview"
+                    >
+                        <div className={previewStyles.mobilePreviewWrapper}
+                            style={{ '--preview-scale': `${Math.min(1, (window.innerWidth - 16) / 794)}` } as React.CSSProperties}>
+                            <div ref={previewRef} className={`a4-sheet ${previewStyles.sheet}`}
+                                style={{ width: '794px', minHeight: '1123px', background: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                                <ResumePreview data={resumeData} />
+                            </div>
                         </div>
                     </motion.aside>
                 </div>

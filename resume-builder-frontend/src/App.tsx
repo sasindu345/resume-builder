@@ -1,21 +1,22 @@
 import './App.css'
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { useAuth } from '@/hooks/useAuth'
-import { Login } from '@/pages/Login'
-import { Register } from '@/pages/Register'
-import { Dashboard } from '@/pages/Dashboard'
-import { ResumeEditor } from '@/pages/ResumeEditor'
-import { Home } from '@/pages/Home'
-import { GuestResumeBuilder } from '@/pages/GuestResumeBuilder'
-import { VerifyEmail } from '@/pages/VerifyEmail'
-import { TemplatesGallery } from '@/pages/TemplatesGallery'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { FloatingShapes } from '@/components/animations/FloatingShapes'
 import { Footer } from '@/components/layout/Footer'
 import headerStyles from '@/styles/components/Header.module.css'
+
+// Lazy-load pages for code splitting
+const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })))
+const Login = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
+const Register = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
+const Dashboard = lazy(() => import('@/pages/Dashboard').then(m => ({ default: m.Dashboard })))
+const ResumeEditor = lazy(() => import('@/pages/ResumeEditor').then(m => ({ default: m.ResumeEditor })))
+const GuestResumeBuilder = lazy(() => import('@/pages/GuestResumeBuilder').then(m => ({ default: m.GuestResumeBuilder })))
+const VerifyEmail = lazy(() => import('@/pages/VerifyEmail').then(m => ({ default: m.VerifyEmail })))
+const TemplatesGallery = lazy(() => import('@/pages/TemplatesGallery').then(m => ({ default: m.TemplatesGallery })))
 
 // Sun icon
 function SunIcon() {
@@ -102,10 +103,15 @@ function AppRoutes() {
     setMobileMenuOpen(false)
   }, [location.pathname])
 
+  // Page loading fallback
+  const PageLoader = () => (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+    </div>
+  )
+
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <FloatingShapes />
-
       <header className={isHomePage ? headerStyles.headerTransparent : headerStyles.header}>
         <div className={headerStyles.headerContent}>
           {/* Logo */}
@@ -195,30 +201,32 @@ function AppRoutes() {
         </div>
       </header>
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/builder" element={<GuestResumeBuilder />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/templates" element={<TemplatesGallery />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/resume/:id"
-          element={
-            <ProtectedRoute>
-              <ResumeEditor />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/builder" element={<GuestResumeBuilder />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/templates" element={<TemplatesGallery />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/resume/:id"
+            element={
+              <ProtectedRoute>
+                <ResumeEditor />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Suspense>
 
       {!hideFooter && <Footer />}
     </div>

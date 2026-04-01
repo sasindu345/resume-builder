@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeftIcon, PlusIcon, TrashIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PlusIcon, TrashIcon, ArrowDownTrayIcon, EyeIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { Camera, X } from 'lucide-react';
 import api from '@/services/api';
@@ -13,8 +13,7 @@ import { AIReviewPanel } from '@/components/resume-editor/AIReviewPanel';
 import { motion } from 'framer-motion';
 import { TemplateName, ThemeName, TEMPLATES, THEMES } from '@/types/template';
 import previewStyles from '../styles/editor/ResumePreview.module.css';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { exportResumePDF } from '@/utils/exportPdf';
 
 export interface ResumeData {
     title: string;
@@ -105,6 +104,7 @@ const defaultResumeData: ResumeData = {
 };
 
 export function ResumeEditor() {
+    const [showPreview, setShowPreview] = useState(false);
     const [expandedExperienceId, setExpandedExperienceId] = useState<string | null>(null);
     const [expandedEducationId, setExpandedEducationId] = useState<string | null>(null);
     const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
@@ -389,38 +389,18 @@ export function ResumeEditor() {
     };
 
     const exportToPDF = async () => {
-        if (!previewRef.current) return;
-
         try {
             setIsExporting(true);
-            toast.loading('Generating PDF...', { id: 'pdf-export' });
+            toast.loading('Preparing PDF...', { id: 'pdf-export' });
 
-            const canvas = await html2canvas(previewRef.current, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff',
-            });
+            const fileName = resumeData.personalInfo.fullName || resumeData.title || 'resume';
+            await exportResumePDF(previewRef, fileName);
 
-            const imgWidth = 210;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4',
-            });
-
-            const imgData = canvas.toDataURL('image/png');
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
-            const fileName = `${resumeData.personalInfo.fullName || resumeData.title || 'resume'}.pdf`;
-            pdf.save(fileName);
-
-            toast.success('PDF downloaded successfully!', { id: 'pdf-export' });
+            toast.success('PDF ready! Use "Save as PDF" in the print dialog.', { id: 'pdf-export' });
         } catch (error) {
-            console.error('PDF export failed:', error);
-            toast.error('Failed to export PDF', { id: 'pdf-export' });
+            console.error('[PDF Export] Failed:', error);
+            const msg = error instanceof Error ? error.message : 'Unknown error';
+            toast.error(`PDF export failed: ${msg}`, { id: 'pdf-export' });
         } finally {
             setIsExporting(false);
         }
@@ -460,27 +440,37 @@ export function ResumeEditor() {
     return (
         <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
             <div className="sticky top-0 z-40 border-b shadow-sm" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
                     <button
                         onClick={() => navigate('/dashboard')}
                         aria-label="Back to dashboard"
-                        className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-black/5"
+                        style={{ color: 'var(--text)' }}
                     >
-                        <ArrowLeftIcon className="h-5 w-5" />
-                        Back
+                        <ArrowLeftIcon className="h-4 w-4" />
+                        <span className="hidden sm:inline">Dashboard</span>
                     </button>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
+                        {/* Mobile Preview Toggle */}
+                        <button
+                            onClick={() => setShowPreview(!showPreview)}
+                            className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+                            style={{ background: showPreview ? 'var(--primary-600)' : 'var(--bg)', color: showPreview ? '#fff' : 'var(--text)', border: '1px solid var(--border)' }}
+                        >
+                            {showPreview ? <PencilSquareIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                            <span className="hidden sm:inline">{showPreview ? 'Edit' : 'Preview'}</span>
+                        </button>
                         <Button
                             onClick={exportToPDF}
                             disabled={isExporting}
                             variant="primary"
                             className="flex items-center gap-2"
                         >
-                            <ArrowDownTrayIcon className="h-5 w-5" />
-                            {isExporting ? 'Exporting...' : 'Download PDF'}
+                            <ArrowDownTrayIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                            <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Download PDF'}</span>
                         </Button>
-                        <div aria-live="polite" role="status" className="text-sm">
+                        <div aria-live="polite" role="status" className="text-sm hidden sm:block">
                             {lastSaved && !isSaving && (
                                 <span className="text-green-600">
                                     Saved {new Date(lastSaved).toLocaleTimeString()}
@@ -524,11 +514,12 @@ export function ResumeEditor() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_820px] gap-6 items-start">
+                    {/* Editor - hide on mobile when preview is shown */}
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="space-y-4"
+                        className={`space-y-4 ${showPreview ? 'hidden lg:block' : ''}`}
                     >
                         {currentStep === 0 && (
                             <>
@@ -1269,20 +1260,23 @@ export function ResumeEditor() {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: 0.1 }}
-                        className="px-2"
+                        className={`${showPreview ? '' : 'hidden lg:block'}`}
                         aria-label="Resume preview"
                     >
-                        <div
-                            ref={previewRef}
-                            className={`a4-sheet mx-auto ${previewStyles.sheet}`}
-                            style={{
-                                width: '210mm',
-                                minHeight: '297mm',
-                                background: '#ffffff',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                            }}
-                        >
-                            <ResumePreview data={resumeData} />
+                        <div className={previewStyles.mobilePreviewWrapper}
+                            style={{ '--preview-scale': `${Math.min(1, (window.innerWidth - 16) / 794)}` } as React.CSSProperties}>
+                            <div
+                                ref={previewRef}
+                                className={`a4-sheet ${previewStyles.sheet}`}
+                                style={{
+                                    width: '794px',
+                                    minHeight: '1123px',
+                                    background: '#ffffff',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                <ResumePreview data={resumeData} />
+                            </div>
                         </div>
                     </motion.aside>
                 </div>
