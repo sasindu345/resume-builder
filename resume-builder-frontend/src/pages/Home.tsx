@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FileText, Zap, Palette, CheckCircle2, ArrowRight, Sparkles, Brain, Image, Download, Eye, Edit3, Shield, Star, Users, TrendingUp, Quote } from 'lucide-react'
+import { FileText, Zap, Palette, CheckCircle2, Sparkles, Brain, Image, Download, Eye, Edit3, Shield, Star, Users, TrendingUp, Quote } from 'lucide-react'
 
 const stats = [
     { label: 'Resumes Created', value: '2,400+', icon: FileText },
@@ -221,51 +221,6 @@ function TestimonialsCarousel() {
     )
 }
 
-/* ── Animated Stat Value Component ── */
-function AnimatedStatValue({ value }: { value: string }) {
-    const [count, setCount] = useState(0);
-
-    useEffect(() => {
-        const numericStr = value.replace(/[^0-9]/g, '');
-        const target = parseInt(numericStr, 10) || 0;
-        if (target === 0) {
-            setCount(0);
-            return;
-        }
-
-        const duration = 2000; // 2 seconds
-        const frameRate = 60;
-        const totalFrames = Math.round((duration / 1000) * frameRate);
-        let frame = 0;
-
-        const timer = setInterval(() => {
-            frame++;
-            const progress = frame / totalFrames;
-            const easeOutProgress = progress * (2 - progress); // Quadratic easeOut
-            const currentVal = Math.round(easeOutProgress * target);
-
-            setCount(currentVal);
-
-            if (frame >= totalFrames) {
-                setCount(target);
-                clearInterval(timer);
-            }
-        }, 1000 / frameRate);
-
-        return () => clearInterval(timer);
-    }, [value]);
-
-    const hasCommas = value.includes(',');
-    const suffix = value.replace(/[0-9,]/g, '');
-
-    const formattedCount = hasCommas 
-        ? count.toLocaleString('en-US') 
-        : count.toString();
-
-    return (
-        <span>{formattedCount}{suffix}</span>
-    );
-}
 
 export function Home() {
     const [textIndex, setTextIndex] = useState(0);
@@ -334,14 +289,13 @@ export function Home() {
                         <div className="animate-fade-in-up-delay-2 space-y-3 pt-2">
                             <Link
                                 to="/builder"
-                                className="group flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-bold text-[15px] text-white shadow-md bg-blue-600 hover:bg-blue-700 transition-all active:scale-[0.98]"
+                                className="flex items-center justify-center w-full py-3.5 rounded-2xl font-bold text-[15px] text-white shadow-md bg-blue-600 hover:bg-blue-700 transition-all active:scale-[0.98] tracking-wide"
                             >
                                 Create Resume Now
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Link>
                             <Link
                                 to="/templates"
-                                className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-semibold text-[15px] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] transition-all"
+                                className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-[15px] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] transition-all tracking-wide"
                             >
                                 <Palette className="w-4 h-4" />
                                 View Templates
@@ -419,14 +373,13 @@ export function Home() {
                             <div className="animate-fade-in-up-delay-2 flex flex-wrap gap-4 items-center">
                                 <Link
                                     to="/builder"
-                                    className="group px-7 py-3.5 rounded-xl font-semibold text-base flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-blue-600/10 active:scale-[0.98] transition-all"
+                                    className="px-7 py-3.5 rounded-xl font-bold text-base text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-blue-600/10 active:scale-[0.98] transition-all text-center tracking-wide"
                                 >
                                     Create Resume Now
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <Link
                                     to="/templates"
-                                    className="px-7 py-3.5 rounded-xl font-semibold text-base flex items-center gap-2 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] transition-all"
+                                    className="px-7 py-3.5 rounded-xl font-bold text-base flex items-center gap-2 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] transition-all tracking-wide"
                                 >
                                     <Palette className="w-5 h-5" />
                                     View Templates
@@ -520,46 +473,36 @@ export function Home() {
             </section>
 
             {/* ──────────────────────────────────────
-                STATS BANNER
+                STATS TICKER (Infinite Moving Animation)
             ────────────────────────────────────── */}
-            <section style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                        {stats.map(({ label, value, icon: Icon }) => (
-                            <div key={label} className="text-center space-y-1">
-                                <div className="flex justify-center mb-2">
-                                    <div
-                                        className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                        style={{
-                                            background: 'color-mix(in srgb, var(--primary-600) 12%, transparent)',
-                                            border: '1px solid color-mix(in srgb, var(--primary-600) 25%, transparent)',
-                                        }}
-                                    >
-                                        <Icon className="w-5 h-5" style={{ color: 'var(--primary-600)' }} />
-                                    </div>
+            <div 
+                className="w-full border-b overflow-hidden relative marquee-mask py-3.5"
+                style={{
+                    background: 'var(--surface)',
+                    borderColor: 'var(--border)',
+                }}
+            >
+                <div className="marquee-row marquee-left" style={{ gap: '6rem', animationDuration: '30s' }}>
+                    {[...stats, ...stats, ...stats, ...stats].map((stat, idx) => {
+                        const Icon = stat.icon;
+                        return (
+                            <div key={idx} className="flex items-center gap-2.5 whitespace-nowrap">
+                                <div 
+                                    className="w-7 h-7 rounded-lg flex items-center justify-center"
+                                    style={{
+                                        background: 'color-mix(in srgb, var(--primary-600) 10%, transparent)',
+                                        border: '1px solid color-mix(in srgb, var(--primary-600) 20%, transparent)',
+                                    }}
+                                >
+                                    <Icon className="w-3.5 h-3.5" style={{ color: 'var(--primary-600)' }} />
                                 </div>
-                                <div className="text-3xl font-extrabold" style={{ color: 'var(--text)', letterSpacing: '-0.03em' }}>
-                                    <AnimatedStatValue value={value} />
-                                </div>
-                                {/* Horizontal Animated Progress Bar */}
-                                <div className="relative w-16 h-1 bg-slate-100 dark:bg-slate-800/80 rounded-full mx-auto my-2 overflow-hidden">
-                                    <motion.div 
-                                        className="absolute left-0 top-0 bottom-0 bg-blue-600 dark:bg-blue-400 rounded-full"
-                                        initial={{ width: "0%" }}
-                                        animate={{ 
-                                            width: value.includes('%') 
-                                                ? `${parseInt(value.replace(/[^0-9]/g, ''), 10)}%` 
-                                                : "100%" 
-                                        }}
-                                        transition={{ duration: 1.8, ease: "easeOut", delay: 0.1 }}
-                                    />
-                                </div>
-                                <div className="text-sm font-medium" style={{ color: 'var(--muted)' }}>{label}</div>
+                                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{stat.value}</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{stat.label}</span>
                             </div>
-                        ))}
-                    </div>
+                        );
+                    })}
                 </div>
-            </section>
+            </div>
 
             {/* ──────────────────────────────────────
                 HOW IT WORKS
@@ -654,16 +597,12 @@ export function Home() {
             ────────────────────────────────────── */}
             <section className="px-4 sm:px-6 lg:px-8 pb-24">
                 <div 
-                    className="max-w-4xl mx-auto rounded-3xl overflow-hidden border shadow-xl relative" 
+                    className="max-w-4xl mx-auto rounded-3xl overflow-hidden border relative" 
                     style={{ 
-                        background: 'var(--surface)', 
+                        background: 'transparent', 
                         borderColor: 'var(--border)' 
                     }}
                 >
-                    {/* Decorative subtle background glow */}
-                    <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: 'var(--primary-600)' }} />
-                    <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: 'var(--accent)' }} />
-
                     <div className="relative z-10 px-8 py-16 text-center space-y-6">
                         <div 
                             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold border"
@@ -684,24 +623,23 @@ export function Home() {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
                             <Link
-                                to="/builder"
-                                className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-white font-bold text-lg hover:opacity-95 transition-all shadow-lg active:scale-[0.98] btn-gradient"
-                            >
-                                Start Building — It's Free
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                            <Link
-                                to="/templates"
-                                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-lg border hover:bg-black/5 dark:hover:bg-white/5 transition-all active:scale-[0.98]"
-                                style={{ 
-                                    borderColor: 'var(--border)', 
-                                    color: 'var(--text)', 
-                                    background: 'var(--surface)' 
-                                }}
-                            >
-                                <Palette className="w-5 h-5" />
-                                Browse Templates
-                            </Link>
+                                    to="/builder"
+                                    className="inline-flex items-center justify-center px-8 py-4 rounded-2xl text-white font-bold text-lg hover:opacity-95 transition-all shadow-lg active:scale-[0.98] btn-gradient tracking-wide"
+                                >
+                                    Start Building — It's Free
+                                </Link>
+                                <Link
+                                    to="/templates"
+                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-lg border hover:bg-black/5 dark:hover:bg-white/5 transition-all active:scale-[0.98] tracking-wide"
+                                    style={{ 
+                                        borderColor: 'var(--border)', 
+                                        color: 'var(--text)', 
+                                        background: 'var(--surface)' 
+                                    }}
+                                >
+                                    <Palette className="w-5 h-5" />
+                                    Browse Templates
+                                </Link>
                         </div>
                     </div>
                 </div>

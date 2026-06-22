@@ -30,12 +30,29 @@ const footerLinks = [
 export function Footer() {
     return (
         <footer
+            className="relative"
             style={{
                 background: 'var(--surface)',
-                borderTop: '1px solid var(--border)',
                 color: 'var(--text)',
             }}
         >
+            {/* Curved Top Shape */}
+            <div className="absolute top-0 left-0 right-0 h-12 -translate-y-full overflow-hidden pointer-events-none">
+                <svg
+                    className="absolute bottom-0 left-0 w-full h-12"
+                    viewBox="0 0 1440 48"
+                    preserveAspectRatio="none"
+                >
+                    <path 
+                        d="M0,48 Q720,0 1440,48 L1440,48 L0,48 Z" 
+                        style={{ fill: 'var(--surface)' }} 
+                    />
+                    <path 
+                        d="M0,48 Q720,0 1440,48" 
+                        style={{ fill: 'none', stroke: 'var(--border)', strokeWidth: 1.5 }} 
+                    />
+                </svg>
+            </div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
                     {/* Brand */}
