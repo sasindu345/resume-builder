@@ -2,6 +2,8 @@
 @import './styles/tokens.css';
 @import 'tailwindcss';
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   color-scheme: light;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -27,6 +29,15 @@ body {
 /* =============================================
    ANIMATION UTILITIES
    ============================================= */
+
+@keyframes zoom-in-slow {
+  from { transform: scale(1.08); }
+  to   { transform: scale(1); }
+}
+
+.animate-ken-burns {
+  animation: zoom-in-slow 12s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
 @keyframes fadeInUp {
   from {
@@ -123,6 +134,53 @@ body {
    COMPONENT UTILITIES
    ============================================= */
 
+.hero-section-desktop {
+  background: #ffffff;
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .hero-section-desktop {
+  background: linear-gradient(135deg, #0b1220 0%, #111e36 50%, #080d18 100%);
+  color: #ffffff;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.perspective-mockup-container {
+  perspective: 1200px;
+}
+
+.perspective-mockup {
+  transform: rotateX(6deg) rotateY(-16deg) rotateZ(4deg);
+  transform-style: preserve-3d;
+  box-shadow: 
+    -10px 10px 25px rgba(0, 0, 0, 0.08),
+    -20px 20px 50px rgba(0, 0, 0, 0.06);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+[data-theme="dark"] .perspective-mockup {
+  box-shadow: 
+    -15px 15px 35px rgba(0, 0, 0, 0.35),
+    -30px 30px 70px rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(15, 22, 40, 0.4);
+}
+
+.perspective-mockup:hover {
+  transform: rotateX(6deg) rotateY(-16deg) rotateZ(4deg) scale(1.02);
+  box-shadow: 
+    -15px 15px 35px rgba(0, 0, 0, 0.12),
+    -35px 35px 70px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .perspective-mockup:hover {
+  box-shadow: 
+    -20px 20px 45px rgba(0, 0, 0, 0.4),
+    -40px 40px 90px rgba(0, 0, 0, 0.3);
+}
+
 .section-badge {
   display: inline-flex;
   align-items: center;
@@ -157,6 +215,17 @@ body {
   background-clip: text;
 }
 
+.hero-gradient-text {
+  background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="dark"] .hero-gradient-text {
+  background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+}
+
 /* Feature icon boxes — theme-aware gradients */
 .feature-icon-box {
   background: var(--light-bg);
@@ -178,18 +247,18 @@ body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* Gradient button */
+/* Solid primary button */
 .btn-gradient {
-  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  background: var(--primary-600);
   color: #fff;
   border: none;
-  transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2);
 }
 .btn-gradient:hover {
-  opacity: 0.92;
+  background: var(--primary-700);
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
 }
 .btn-gradient:active {
   transform: translateY(0);

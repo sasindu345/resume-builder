@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon, SparklesIcon, UserCircleIcon, LockClosedIcon, EyeIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/common/Button';
@@ -109,6 +109,7 @@ const defaultResumeData: GuestResumeData = {
  */
 export function GuestResumeBuilder() {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { isAuthenticated } = useAuth();
 
     const [resumeData, setResumeData] = useState<GuestResumeData>(() => {
@@ -131,6 +132,22 @@ export function GuestResumeBuilder() {
             return defaultResumeData;
         }
     });
+
+    // Check for template url query parameter on mount and apply if valid
+    useEffect(() => {
+        const templateParam = searchParams.get('template');
+        if (templateParam && Object.keys(TEMPLATES).includes(templateParam)) {
+            setResumeData(prev => ({
+                ...prev,
+                template: templateParam as TemplateName
+            }));
+            
+            // Clean up the parameter from URL
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('template');
+            setSearchParams(newParams, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
 
     const [currentStep, setCurrentStep] = useState(0);
     const [isExporting, setIsExporting] = useState(false);

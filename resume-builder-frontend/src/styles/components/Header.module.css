@@ -17,6 +17,7 @@
 }
 
 /* Transparent header for hero section on home page */
+/* Transparent header for hero section on home page */
 .headerTransparent {
     position: absolute;
     width: 100%;
@@ -25,41 +26,84 @@
     background: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid var(--border);
     box-shadow: none;
     transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 .headerTransparent .navLink {
-    color: rgba(255,255,255,0.75);
+    color: var(--muted);
 }
 
 .headerTransparent .navLink:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.1);
+    color: var(--text);
+    background: var(--bg);
 }
 
 .headerTransparent .logoText {
-    background: linear-gradient(135deg, #93c5fd, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--primary-600);
 }
 
 .headerTransparent .themeToggle {
-    border-color: rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.08);
-    color: #fff;
+    border-color: var(--border);
+    background: var(--surface);
+    color: var(--text);
 }
 
 .headerTransparent .themeToggle:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.35);
-    color: #fff;
+    background: var(--bg);
+    border-color: var(--primary-600);
+    color: var(--primary-600);
 }
 
 .headerTransparent .navDivider {
-    background: rgba(255,255,255,0.2);
+    background: var(--border);
+}
+
+.headerTransparent .hamburger {
+    border-color: var(--border);
+    background: var(--surface);
+    color: var(--text);
+}
+
+/* Dark mode overrides for transparent header */
+[data-theme="dark"] .headerTransparent {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .headerTransparent .navLink {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+[data-theme="dark"] .headerTransparent .navLink:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .headerTransparent .logoText {
+    color: var(--primary-600);
+}
+
+[data-theme="dark"] .headerTransparent .themeToggle {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+[data-theme="dark"] .headerTransparent .themeToggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #fff;
+}
+
+[data-theme="dark"] .headerTransparent .navDivider {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .headerTransparent .hamburger {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
 }
 
 .headerContent {
@@ -101,10 +145,7 @@
 }
 
 .logoText {
-    background: linear-gradient(135deg, var(--primary-600), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--primary-600);
 }
 
 /* Nav */

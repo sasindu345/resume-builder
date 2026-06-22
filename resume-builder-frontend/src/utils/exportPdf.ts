@@ -147,8 +147,81 @@ export async function exportResumePDF(
 
     removeExistingPrintArtifacts();
 
-    const previousTitle = document.title;
     const safeTitle = sanitizeFileName(fileName);
+
+    // Detect mobile device
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobileDevice) {
+        const clonedPreview = previewEl.cloneNode(true) as HTMLElement;
+        
+        // Temporarily mount the element off-screen for canvas rendering
+        clonedPreview.style.position = 'fixed';
+        clonedPreview.style.left = '-9999px';
+        clonedPreview.style.top = '0';
+        clonedPreview.style.width = '794px'; // ~A4 width in px at 96 DPI
+        clonedPreview.style.minHeight = '1123px'; // ~A4 height in px at 96 DPI
+        clonedPreview.style.maxWidth = 'none';
+        clonedPreview.style.transform = 'none';
+        clonedPreview.style.background = '#ffffff';
+        clonedPreview.style.color = '#000000';
+        clonedPreview.style.boxShadow = 'none';
+        clonedPreview.style.border = 'none';
+        clonedPreview.style.borderRadius = '0';
+        clonedPreview.style.overflow = 'visible';
+        clonedPreview.style.boxSizing = 'border-box';
+        
+        document.body.appendChild(clonedPreview);
+        
+        await waitForPrintLayout(clonedPreview);
+        
+        try {
+            // Lazy load dependencies to optimize initial page loading
+            const html2canvas = (await import('html2canvas')).default;
+            const { jsPDF } = await import('jspdf');
+            
+            const canvas = await html2canvas(clonedPreview, {
+                scale: 2, // High resolution crisp text/images
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+            });
+            
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+            });
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pdfWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            let heightLeft = imgHeight;
+            let position = 0;
+            
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pdfHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pdfHeight;
+            }
+            
+            pdf.save(`${safeTitle}.pdf`);
+        } finally {
+            clonedPreview.remove();
+        }
+        return;
+    }
+
+    // Desktop/standard window.print() path
+    const previousTitle = document.title;
     const styleEl = document.createElement('style');
     const clonedPreview = previewEl.cloneNode(true) as HTMLElement;
     const printRoot = createPrintRoot(clonedPreview);
