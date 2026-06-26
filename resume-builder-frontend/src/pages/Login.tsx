@@ -1,5 +1,5 @@
 /**
- * Login Page - User authentication with email and password
+ * Login Page - Compact, professional centered authentication card (No cover image, no gradients)
  */
 
 import { useState } from 'react'
@@ -8,12 +8,15 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuth } from '@/hooks/useAuth'
-import { Button } from '@/components/common/Button'
-import { Input } from '@/components/common/Input'
-import { FloatingShapes } from '@/components/animations/FloatingShapes'
 import toast from 'react-hot-toast'
-import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { 
+    Mail, 
+    Lock, 
+    Eye, 
+    EyeOff, 
+    FileText 
+} from 'lucide-react'
 
 const loginSchema = z.object({
     email: z.string().email('Please enter a valid email address'),
@@ -26,6 +29,7 @@ export const Login = () => {
     const navigate = useNavigate()
     const { login } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
 
     const {
         register,
@@ -35,9 +39,6 @@ export const Login = () => {
         resolver: zodResolver(loginSchema),
     })
 
-    /**
-     * Handle form submission
-     */
     const onSubmit = async (data: LoginFormData) => {
         try {
             setIsLoading(true)
@@ -56,79 +57,132 @@ export const Login = () => {
     }
 
     return (
-        <div className="min-h-screen relative flex flex-col justify-center px-4 sm:px-6 py-12" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
-            <FloatingShapes />
-
-            <div className="w-full max-w-md mx-auto relative z-10">
-                {/* Header */}
-                <div className="mb-8 text-center">
-                    <Link to="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                        Resume Builder
+        <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50 dark:bg-[#0b1220] transition-colors duration-300">
+            {/* Centered Professional Login Card (Resized to fit content perfectly) */}
+            <div className="w-full max-w-[420px] bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl border border-slate-100 dark:border-slate-800/60 p-8 sm:p-10 relative">
+                
+                {/* Logo Section */}
+                <div className="flex justify-center mb-6">
+                    <Link to="/" className="inline-flex items-center gap-2 font-black text-xl text-slate-900 dark:text-white">
+                        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md">
+                            <FileText className="w-4.5 h-4.5" />
+                        </div>
+                        <span className="tracking-tight text-lg">ResumeBuilder</span>
                     </Link>
-                    <h1 className="mt-4 text-2xl font-bold" style={{ color: 'var(--text)', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>Welcome back</h1>
-                    <p className="mt-2" style={{ color: 'var(--muted)' }}>
-                        Don't have an account?{' '}
-                        <Link to="/register" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-semibold">
-                            Create one
-                        </Link>
+                </div>
+
+                {/* Heading */}
+                <div className="text-center mb-8">
+                    <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                        Sign In
+                    </h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-1.5 leading-relaxed">
+                        Please login to access your dashboard and saved resumes.
                     </p>
                 </div>
 
                 {/* Login Form */}
-                <form onSubmit={handleSubmit(onSubmit)} className="backdrop-blur rounded-2xl p-6 sm:p-8 border shadow-xl" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                    {/* Email Field */}
-                    <Input
-                        label="Email address"
-                        type="email"
-                        placeholder="you@example.com"
-                        icon={<EnvelopeIcon className="h-5 w-5" />}
-                        {...register('email')}
-                        error={errors.email?.message}
-                        required
-                    />
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {/* Email field */}
+                    <div>
+                        <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                            <input
+                                type="email"
+                                placeholder="Email address"
+                                className={`w-full pl-11 pr-5 py-2.5 rounded-full border bg-slate-50/50 dark:bg-slate-900/30 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 transition-all duration-200 text-xs ${
+                                    errors.email 
+                                        ? 'border-red-300 dark:border-red-900/50 focus:ring-red-500/20 focus:border-red-500' 
+                                        : 'border-slate-200 dark:border-slate-800 focus:ring-blue-500/20 focus:border-blue-500'
+                                }`}
+                                {...register('email')}
+                                required
+                            />
+                        </div>
+                        {errors.email && (
+                            <p className="text-[11px] text-red-505 mt-1.5 pl-4 font-semibold">
+                                {errors.email.message}
+                            </p>
+                        )}
+                    </div>
 
-                    {/* Password Field */}
-                    <div className="mt-5">
-                        <Input
-                            label="Password"
-                            type="password"
-                            placeholder="••••••••"
-                            icon={<LockClosedIcon className="h-5 w-5" />}
-                            {...register('password')}
-                            error={errors.password?.message}
-                            required
-                        />
+                    {/* Password field */}
+                    <div>
+                        <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Password"
+                                className={`w-full pl-11 pr-11 py-2.5 rounded-full border bg-slate-50/50 dark:bg-slate-900/30 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 transition-all duration-200 text-xs ${
+                                    errors.password 
+                                        ? 'border-red-300 dark:border-red-900/50 focus:ring-red-500/20 focus:border-red-500' 
+                                        : 'border-slate-200 dark:border-slate-800 focus:ring-blue-500/20 focus:border-blue-500'
+                                }`}
+                                {...register('password')}
+                                required
+                            />
+                            <button
+                                type="button"
+                                tabIndex={-1}
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                                {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                            </button>
+                        </div>
+                        {errors.password && (
+                            <p className="text-[11px] text-red-505 mt-1.5 pl-4 font-semibold">
+                                {errors.password.message}
+                            </p>
+                        )}
                     </div>
 
                     {/* Forgot Password Link */}
-                    <div className="mt-3 text-sm">
-                        <Link to="/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium">
+                    <div className="flex justify-end text-xs pt-1">
+                        <Link 
+                            to="/forgot-password" 
+                            className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 transition-colors"
+                        >
                             Forgot password?
                         </Link>
                     </div>
 
-                    {/* Submit Button */}
-                    <Button
+                    {/* Submit Button (Solid Blue - No gradient, no arrow) */}
+                    <button
                         type="submit"
-                        loading={isLoading}
-                        fullWidth
-                        className="mt-6"
+                        disabled={isLoading}
+                        className="w-full flex items-center justify-center py-2.5 px-6 rounded-full font-bold text-white shadow-md bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-[14px]"
                     >
-                        Sign in
-                    </Button>
+                        {isLoading ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <span>Sign In</span>
+                        )}
+                    </button>
 
-                    {/* Removed visual divider */}
-
-                    {/* Removed demo credentials for production-readiness */}
+                    {/* Route Switcher & Back to Home */}
+                    <div className="text-center pt-4 space-y-2 border-t border-slate-100 dark:border-slate-800/80 mt-6">
+                        <div className="text-xs text-slate-500 dark:text-slate-400">
+                            Don't have an account?{' '}
+                            <Link 
+                                to="/register" 
+                                className="font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                                Sign Up
+                            </Link>
+                        </div>
+                        <div>
+                            <Link 
+                                to="/" 
+                                className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 transition-colors inline-block pt-1"
+                            >
+                                Back to Home
+                            </Link>
+                        </div>
+                    </div>
                 </form>
 
-                {/* Footer */}
-                <p className="mt-6 text-center text-sm" style={{ color: 'var(--muted)' }}>
-                    By signing in, you agree to our{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
-                        Terms of Service
-                    </a>
-                </p>
             </div>
         </div>
     )

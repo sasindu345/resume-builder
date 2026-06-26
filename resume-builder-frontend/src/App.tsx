@@ -63,8 +63,9 @@ function AppRoutes() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Hide footer on builder/editor pages
-  const hideFooter = location.pathname.startsWith('/builder') || location.pathname.startsWith('/resume/')
+  // Hide header and footer on builder/editor/auth pages
+  const hideHeader = location.pathname.startsWith('/builder') || location.pathname.startsWith('/resume/') || ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password'].includes(location.pathname)
+  const hideFooter = location.pathname.startsWith('/builder') || location.pathname.startsWith('/resume/') || ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password'].includes(location.pathname)
   // Transparent header on home page
   const isHomePage = location.pathname === '/'
 
@@ -112,7 +113,8 @@ function AppRoutes() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <header className={isHomePage ? headerStyles.headerTransparent : headerStyles.header}>
+      {!hideHeader && (
+        <header className={isHomePage ? headerStyles.headerTransparent : headerStyles.header}>
         <div className={headerStyles.headerContent}>
           {/* Logo */}
           <Link to="/" className={headerStyles.logo}>
@@ -200,6 +202,7 @@ function AppRoutes() {
           )}
         </div>
       </header>
+      )}
 
       <Suspense fallback={<PageLoader />}>
         <Routes>

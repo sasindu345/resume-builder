@@ -237,9 +237,9 @@ export function Home() {
         <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
 
             {/* ──────────────────────────────────────
-                HERO — MOBILE (app-like fullscreen)
+                HERO — MOBILE (Clean flowing stack)
             ────────────────────────────────────── */}
-            <section className="sm:hidden relative overflow-hidden" style={{ minHeight: '100svh' }}>
+            <section className="sm:hidden relative overflow-hidden pb-12">
                 {/* Theme-aware background */}
                 <div className="absolute inset-0 z-0 bg-white dark:bg-[#0b1220] transition-colors duration-300" />
                 
@@ -249,62 +249,59 @@ export function Home() {
                 <div className="absolute bottom-[10%] left-[-20%] w-[50vw] h-[50vw] rounded-full opacity-5 dark:opacity-15 pointer-events-none"
                     style={{ background: 'radial-gradient(circle, #7c3aed, transparent 70%)' }} />
 
-                <div className="relative z-10 flex flex-col justify-between px-6 pt-20 pb-8" style={{ minHeight: '100svh' }}>
-                    {/* Top content */}
-                    <div className="flex-1 flex flex-col justify-center space-y-6">
-                        {/* Small badge */}
-                        <div className="animate-fade-in-up">
-                            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-semibold tracking-wide uppercase bg-blue-50 dark:bg-slate-800/50 border border-blue-100 dark:border-slate-700 text-blue-700 dark:text-blue-300">
-                                Free &middot; AI-Powered
+                <div className="relative z-10 flex flex-col px-6 pt-24 pb-4 space-y-8">
+                    {/* Small badge */}
+                    <div className="animate-fade-in-up">
+                        <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-semibold tracking-wide uppercase bg-blue-50 dark:bg-slate-800/50 border border-blue-100 dark:border-slate-700 text-blue-700 dark:text-blue-300">
+                            Free &middot; AI-Powered
+                        </span>
+                    </div>
+
+                    {/* Heading */}
+                    <div className="animate-fade-in-up-delay-1 space-y-3">
+                        <h1 className="text-3xl xs:text-4xl font-extrabold leading-[1.12] tracking-tight text-slate-900 dark:text-white">
+                            Build Resumes<br />
+                            That{' '}
+                            <span className="relative inline-block overflow-hidden h-[1.2em] min-w-[240px] align-bottom">
+                                <AnimatePresence mode="wait">
+                                    <motion.span
+                                        key={textIndex}
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        exit={{ y: -20, opacity: 0 }}
+                                        transition={{ duration: 0.35, ease: "easeOut" }}
+                                        className="absolute left-0 text-blue-600 dark:text-blue-400"
+                                        style={{ whiteSpace: 'nowrap' }}
+                                    >
+                                        {cyclingTexts[textIndex]}
+                                    </motion.span>
+                                </AnimatePresence>
                             </span>
-                        </div>
+                        </h1>
+                        <p className="text-[14px] leading-relaxed text-slate-700 dark:text-slate-300 max-w-[290px]">
+                            Create professional, ATS-friendly resumes in minutes with AI-powered feedback.
+                        </p>
+                    </div>
 
-                        {/* Heading */}
-                        <div className="animate-fade-in-up-delay-1 space-y-3">
-                            <h1 className="text-[2.5rem] font-extrabold leading-[1.08] tracking-tight text-slate-900 dark:text-white">
-                                Build Resumes<br />
-                                That{' '}
-                                <span className="relative inline-block overflow-hidden h-[1.2em] min-w-[200px] align-bottom">
-                                    <AnimatePresence mode="wait">
-                                        <motion.span
-                                            key={textIndex}
-                                            initial={{ y: 25, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            exit={{ y: -25, opacity: 0 }}
-                                            transition={{ duration: 0.35, ease: "easeOut" }}
-                                            className="absolute left-0 text-blue-600 dark:text-blue-400"
-                                            style={{ whiteSpace: 'nowrap' }}
-                                        >
-                                            {cyclingTexts[textIndex]}
-                                        </motion.span>
-                                    </AnimatePresence>
-                                </span>
-                            </h1>
-                            <p className="text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 max-w-[300px]">
-                                Create professional, ATS-friendly resumes in minutes with AI-powered feedback.
-                            </p>
-                        </div>
-
-                        {/* CTA */}
-                        <div className="animate-fade-in-up-delay-2 space-y-3 pt-2">
-                            <Link
-                                to="/builder"
-                                className="flex items-center justify-center w-full py-3.5 rounded-2xl font-bold text-[15px] text-white shadow-md bg-blue-600 hover:bg-blue-700 transition-all active:scale-[0.98] tracking-wide"
-                            >
-                                Create Resume Now
-                            </Link>
-                            <Link
-                                to="/templates"
-                                className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-[15px] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] transition-all tracking-wide"
-                            >
-                                <Palette className="w-4 h-4" />
-                                View Templates
-                            </Link>
-                        </div>
+                    {/* CTA */}
+                    <div className="animate-fade-in-up-delay-2 space-y-3 pt-1">
+                        <Link
+                            to="/builder"
+                            className="flex items-center justify-center w-full py-3 rounded-2xl font-bold text-[14px] text-white shadow-md bg-blue-600 hover:bg-blue-700 transition-all active:scale-[0.98] tracking-wide cursor-pointer"
+                        >
+                            Create Resume Now
+                        </Link>
+                        <Link
+                            to="/templates"
+                            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-bold text-[14px] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] transition-all tracking-wide cursor-pointer"
+                        >
+                            <Palette className="w-4 h-4" />
+                            View Templates
+                        </Link>
                     </div>
 
                     {/* Bottom feature pills */}
-                    <div className="animate-fade-in-up-delay-3 pt-6">
+                    <div className="animate-fade-in-up-delay-3 pt-6 border-t border-slate-100 dark:border-slate-800/60">
                         <div className="grid grid-cols-2 gap-2.5">
                             {[
                                 { icon: Shield, label: 'No sign-up needed' },
