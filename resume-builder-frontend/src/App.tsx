@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { Footer } from '@/components/layout/Footer'
 import headerStyles from '@/styles/components/Header.module.css'
+import api from '@/services/api'
 
 // Lazy-load pages for code splitting
 const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })))
@@ -62,6 +63,23 @@ function AppRoutes() {
   const { isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Wake-up and keep-alive ping to backend
+  useEffect(() => {
+    const pingBackend = () => {
+      api.get('/auth/health').catch(() => {
+        // Silently catch errors as this is just a background wake-up ping
+      })
+    }
+
+    // Ping immediately on mount
+    pingBackend()
+
+    // Ping every 5 minutes (300,000 ms) to keep it awake
+    const interval = setInterval(pingBackend, 5 * 60 * 1000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   // Hide header and footer on builder/editor/auth pages
   const hideHeader = location.pathname.startsWith('/builder') || location.pathname.startsWith('/resume/') || ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password'].includes(location.pathname)
